@@ -1,34 +1,41 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 // Function to generate reservation ID
 const generateReservationId = () => {
-  const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+  const random = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
   return `AZ-${random}`;
 };
 
 // Function to calculate time remaining
-const calculateTimeRemaining = (targetDate) => {
+const calculateTimeRemaining = (targetDate: string | Date) => {
   const now = new Date().getTime();
   const target = new Date(targetDate).getTime();
   const difference = target - now;
 
-  if (difference > 0) {
-    const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
-    return { days, hours, minutes, seconds, isExpired: false };
+  if (difference <= 0) {
+    return { days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: true };
   }
 
-  return { days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: true };
+  return {
+    days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+    hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+    minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
+    seconds: Math.floor((difference % (1000 * 60)) / 1000),
+    isExpired: false,
+  };
 };
 
 // Countdown Timer Component
-const CountdownTimer = ({ targetDate }) => {
-  const [timeRemaining, setTimeRemaining] = useState(calculateTimeRemaining(targetDate));
+interface CountdownTimerProps {
+  targetDate: string | Date;
+}
+
+const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetDate }) => {
+  const [timeRemaining, setTimeRemaining] = useState(
+    calculateTimeRemaining(targetDate)
+  );
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -48,105 +55,122 @@ const CountdownTimer = ({ targetDate }) => {
 
   return (
     <div className="mt-4">
-      <p className="text-sm text-[#666] mb-2 font-['Lora']">Time until your reservation:</p>
+      <p className="text-sm text-[#666] mb-2 font-['Lora']">
+        Time until your reservation:
+      </p>
       <div className="grid grid-cols-4 gap-2 text-center">
-        <div className="bg-[#D4A017]/20 rounded-lg p-2 border border-[#D4A017]">
-          <div className="text-xl font-bold text-[#D4A017]">{timeRemaining.days}</div>
-          <div className="text-xs text-[#666]">Days</div>
-        </div>
-        <div className="bg-[#D4A017]/20 rounded-lg p-2 border border-[#D4A017]">
-          <div className="text-xl font-bold text-[#D4A017]">{timeRemaining.hours}</div>
-          <div className="text-xs text-[#666]">Hours</div>
-        </div>
-        <div className="bg-[#D4A017]/20 rounded-lg p-2 border border-[#D4A017]">
-          <div className="text-xl font-bold text-[#D4A017]">{timeRemaining.minutes}</div>
-          <div className="text-xs text-[#666]">Minutes</div>
-        </div>
-        <div className="bg-[#D4A017]/20 rounded-lg p-2 border border-[#D4A017]">
-          <div className="text-xl font-bold text-[#D4A017]">{timeRemaining.seconds}</div>
-          <div className="text-xs text-[#666]">Seconds</div>
-        </div>
+        {["days", "hours", "minutes", "seconds"].map((unit, i) => (
+          <div
+            key={i}
+            className="bg-[#D4A017]/20 rounded-lg p-2 border border-[#D4A017]"
+          >
+            <div className="text-xl font-bold text-[#D4A017]">
+              {timeRemaining[unit as keyof typeof timeRemaining]}
+            </div>
+            <div className="text-xs text-[#666]">
+              {unit.charAt(0).toUpperCase() + unit.slice(1)}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
 };
 
+// Reservation type
+interface Reservation {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  date: string;
+  time: string;
+  dateTime: string;
+  guests: number;
+  createdAt: string;
+  status: string;
+}
+
 // The main component for the reservations page
 const ReservationsPage = () => {
-  // State to manage the current view: 'form', 'success', or 'tracking'
-  const [view, setView] = useState('form');
-  // State to store a list of all reservations made
-  const [reservations, setReservations] = useState([]);
-  // State to hold the current reservation being viewed
-  const [currentReservation, setCurrentReservation] = useState(null);
-  // State for the tracking page input and error
-  const [trackingId, setTrackingId] = useState('');
-  const [trackingError, setTrackingError] = useState('');
-  
-  // State for the reservation form fields
+  const [view, setView] = useState<"form" | "success" | "tracking">("form");
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [currentReservation, setCurrentReservation] =
+    useState<Reservation | null>(null);
+
+  const [trackingId, setTrackingId] = useState("");
+  const [trackingError, setTrackingError] = useState("");
+
   const [formFields, setFormFields] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    date: '',
-    time: '',
+    name: "",
+    email: "",
+    phone: "",
+    date: "",
+    time: "",
     guests: 1,
-    id: null, // to track if we are editing an existing reservation
+    id: null as string | null,
   });
 
-  // State to manage the random background image
-  const [backgroundImage, setBackgroundImage] = useState('');
+  const [backgroundImage, setBackgroundImage] = useState("");
   const backgroundImages = [
-    '/images/bg1.png',
-    '/images/bg2.png',
-    '/images/bg3.png',
-    '/images/bg4.png',
+    "/images/bg1.png",
+    "/images/bg2.png",
+    "/images/bg3.png",
+    "/images/bg4.png",
   ];
 
-  // Effect to handle the random background image cycling
   useEffect(() => {
     const backgroundTimer = setInterval(() => {
-      // Randomly decide if a background should appear or disappear
       const shouldShow = Math.random() > 0.5;
       if (shouldShow) {
         const randomIndex = Math.floor(Math.random() * backgroundImages.length);
         setBackgroundImage(backgroundImages[randomIndex]);
       } else {
-        setBackgroundImage('');
+        setBackgroundImage("");
       }
-    }, 5000); // Change every 5 seconds
+    }, 5000);
 
     return () => clearInterval(backgroundTimer);
-  }, []); // Empty dependency array means this runs once on component mount
+  }, []);
 
-  // Function to handle form input changes
-  const handleFormChange = (e) => {
+  const handleFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormFields(prev => ({ ...prev, [name]: value }));
+    setFormFields((prev) => ({
+      ...prev,
+      [name]: name === "guests" ? parseInt(value) || 1 : value,
+    }));
   };
 
-  // Function to handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Check if we are editing an existing reservation
+
     if (formFields.id) {
-      // Find and update the existing reservation
-      const updatedReservations = reservations.map(res =>
+      const updatedReservations = reservations.map((res) =>
         res.id === formFields.id
-          ? { ...res, ...formFields, dateTime: `${formFields.date}T${formFields.time}` }
+          ? {
+              ...res,
+              name: formFields.name,
+              email: formFields.email,
+              phone: formFields.phone,
+              date: formFields.date,
+              time: formFields.time,
+              guests: formFields.guests,
+              dateTime: `${formFields.date}T${formFields.time}`,
+            }
           : res
       );
       setReservations(updatedReservations);
-      setCurrentReservation(updatedReservations.find(res => res.id === formFields.id));
-      console.log("Reservation updated:", updatedReservations.find(res => res.id === formFields.id));
-      setView('success');
+      setCurrentReservation(
+        updatedReservations.find((res) => res.id === formFields.id) || null
+      );
+      setView("success");
     } else {
-      // Create a new reservation
       const reservationId = generateReservationId();
       const reservationDateTime = `${formFields.date}T${formFields.time}`;
-      
-      const newReservation = {
+
+      const newReservation: Reservation = {
         id: reservationId,
         name: formFields.name,
         email: formFields.email,
@@ -154,16 +178,14 @@ const ReservationsPage = () => {
         date: formFields.date,
         time: formFields.time,
         dateTime: reservationDateTime,
-        guests: parseInt(formFields.guests),
+        guests: formFields.guests,
         createdAt: new Date().toISOString(),
-        status: 'confirmed'
+        status: "confirmed",
       };
 
-      // Store the new reservation in state
-      setReservations(prevReservations => [...prevReservations, newReservation]);
+      setReservations((prev) => [...prev, newReservation]);
       setCurrentReservation(newReservation);
-      console.log("Reservation created:", newReservation);
-      setView('success');
+      setView("success");
     }
   };
 
@@ -201,27 +223,24 @@ const ReservationsPage = () => {
   // Function to switch to the tracking page
   const showTrackingPage = () => {
     setView('tracking');
-    setTrackingError(''); // Clear any previous errors
+    setTrackingError('');
   };
 
   // Function to handle tracking form submission
-  const handleTrackSubmit = (e) => {
+  const handleTrackSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Find the reservation in our state by ID
     const foundReservation = reservations.find(res => res.id === trackingId.toUpperCase());
     
     if (foundReservation) {
       setCurrentReservation(foundReservation);
-      setView('success'); // Reuse the success page to show details and countdown
+      setView('success');
       setTrackingError('');
     } else {
       setTrackingError('Reservation ID not found. Please check your ID and try again.');
     }
   };
 
-  // Custom styles are embedded here to keep the component a single, self-contained file.
-  // This is a workaround for the single file mandate and allows for complex styling
-  // that isn't easily done with Tailwind classes alone.
+  // Custom styles
   const customStyles = `
     .font-cormorant {
       font-family: 'Cormorant Garamond', serif;
@@ -255,12 +274,12 @@ const ReservationsPage = () => {
       transform: scaleX(1);
     }
     .btn-gold {
-      padding: 1rem 2.5rem; /* px-10 py-3 */
+      padding: 1rem 2.5rem;
       background-color: #D4A017;
       color: #1A1A1A;
       font-weight: 600;
-      border-radius: 9999px; /* rounded-full */
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08); /* shadow-lg */
+      border-radius: 9999px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
       transition-property: all;
       transition-duration: 300ms;
     }
@@ -269,13 +288,13 @@ const ReservationsPage = () => {
       transform: scale(1.05);
     }
     .btn-gold-outline {
-      padding: 1rem 2.5rem; /* px-10 py-3 */
+      padding: 1rem 2.5rem;
       background-color: transparent;
       color: #D4A017;
       font-weight: 600;
-      border-radius: 9999px; /* rounded-full */
+      border-radius: 9999px;
       border: 2px solid #D4A017;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08); /* shadow-lg */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
       transition-property: all;
       transition-duration: 300ms;
     }
@@ -308,7 +327,7 @@ const ReservationsPage = () => {
       color: #4A4A4A;
       transition-property: color;
       transition-duration: 300ms;
-      font-size: 0.875rem; /* text-sm */
+      font-size: 0.875rem;
       font-family: 'Cormorant Garamond';
     }
     .social-link:hover {
@@ -316,7 +335,7 @@ const ReservationsPage = () => {
     }
     @media (min-width: 768px) {
       .social-link {
-        font-size: 1rem; /* md:text-base */
+        font-size: 1rem;
       }
     }
     @media (max-width: 640px) {
@@ -333,11 +352,9 @@ const ReservationsPage = () => {
     <>
       <style>{customStyles}</style>
       <div className="min-h-screen text-[#1A1A1A] font-playfair antialiased transition-background duration-1000" style={{ backgroundImage: backgroundImage ? `url(${backgroundImage})` : 'none', backgroundColor: '#F8F4E3', backgroundSize: 'cover', backgroundPosition: 'center' }}>
-        {/* Global Background Pattern - Replaced image with a gradient since images are not supported */}
         <div className="fixed inset-0 z-0 opacity-70 bg-gradient-to-br from-[#F8F4E3] via-transparent to-[#D4A017]"></div>
         <div className="fixed inset-0 z-0 bg-[#F8F4E3] opacity-30"></div>
 
-        {/* Navigation Bar */}
         <nav className="fixed top-0 left-0 w-full bg-[#F8F4E3]/90 backdrop-blur-sm z-20 shadow-lg border-b border-[#D4A017]/50">
           <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
             <a href="/" className="group">
@@ -357,13 +374,11 @@ const ReservationsPage = () => {
           </div>
         </nav>
 
-        {/* Main Content */}
         <main className="relative min-h-screen flex items-center justify-center p-6 overflow-hidden pt-28">
           <div className="absolute inset-0 bg-black/50 z-0"></div>
 
           <div id="reservation-card" className="relative rounded-3xl p-8 sm:p-16 shadow-2xl max-w-2xl text-center z-10 flex flex-col items-center shiny-gold-card-bg">
             
-            {/* Conditional Rendering based on 'view' state */}
             {view === 'form' && (
               <>
                 <h1 className="text-6xl font-['Cormorant_Garamond'] text-[#D4A017] mb-4 drop-shadow-md">
@@ -373,7 +388,6 @@ const ReservationsPage = () => {
                   Secure your table for an unforgettable dining experience.
                 </p>
                 <form id="reservation-form" onSubmit={handleSubmit} className="w-full space-y-6">
-                  {/* Form fields */}
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#D4A017]">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" className="w-4 h-4 fill-current"><path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.4 304 0 383.4 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.4 368.6 304 269.7 304H178.3z"/></svg>
@@ -425,13 +439,11 @@ const ReservationsPage = () => {
                   Reservation Confirmed!
                 </h2>
                 
-                {/* Reservation ID Display */}
                 <div className="bg-[#D4A017]/10 rounded-lg p-4 mb-6 border border-[#D4A017]">
                   <h3 className="text-lg font-semibold text-[#D4A017] mb-1">Your Reservation ID</h3>
                   <p className="text-2xl font-mono font-bold text-[#1A1A1A]">{currentReservation?.id}</p>
                 </div>
 
-                {/* Reservation Details */}
                 <div className="text-left mb-6 space-y-2">
                   <p className="text-lg font-['Lora'] text-[#555]">
                     <strong>Name:</strong> {currentReservation?.name}
@@ -447,7 +459,6 @@ const ReservationsPage = () => {
                   </p>
                 </div>
 
-                {/* Countdown Timer */}
                 {currentReservation && (
                   <CountdownTimer targetDate={currentReservation.dateTime} />
                 )}
@@ -499,7 +510,7 @@ const ReservationsPage = () => {
                   <button type="submit" className="btn-gold-outline w-full mt-6">
                     Track Reservation
                   </button>
-                  <button onClick={handleMakeAnother} className="btn-gold">
+                  <button type="button" onClick={handleMakeAnother} className="btn-gold w-full">
                     Make a New Reservation
                   </button>
                 </form>
@@ -508,7 +519,6 @@ const ReservationsPage = () => {
 
           </div>
 
-          {/* Floating 'Track My Reservation' button on the main form page */}
           {view === 'form' && (
             <button
               onClick={showTrackingPage}
@@ -523,7 +533,6 @@ const ReservationsPage = () => {
 
         </main>
 
-        {/* Footer */}
         <footer className="bg-[#F8F4E3] py-12 relative border-t border-t-[#D4A017]/30 patterned-cream-bg">
           <div className="max-w-7xl mx-auto px-6 text-center relative z-10">
             <p className="text-[#333] font-['Cormorant_Garamond'] mb-4">
