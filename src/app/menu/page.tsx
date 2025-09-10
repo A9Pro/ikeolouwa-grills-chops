@@ -12,6 +12,7 @@ type MenuItem = {
     title: string;
     options: { label: string; price: number }[];
   }[];
+  category?: 'main' | 'grill' | 'small-chops';
 };
 
 // Define the type for a cart item
@@ -49,11 +50,13 @@ const generateOrderNumber = () => {
 
 // Define menu items with images and structured options
 const menu: MenuItem[] = [
+  // Main Menu Items
   {
     id: 1,
     name: "Stir Fry Spaghetti",
     price: 1500,
     image: "/images/spaghetti.png",
+    category: 'main',
     optionGroups: [
       {
         title: "Protein",
@@ -70,6 +73,7 @@ const menu: MenuItem[] = [
     name: "Jollof Rice",
     price: 2500,
     image: "/images/jollof-rice.png",
+    category: 'main',
     optionGroups: [
       {
         title: "Protein",
@@ -95,6 +99,7 @@ const menu: MenuItem[] = [
     name: "Yam and Egg",
     price: 3000,
     image: "/images/yam-egg.png",
+    category: 'main',
     optionGroups: [
       {
         title: "Protein",
@@ -111,6 +116,7 @@ const menu: MenuItem[] = [
     name: "Ewa Agoyin, Ponmo & Eja Kika",
     price: 3000,
     image: "/images/ewa-agoyin.png",
+    category: 'main',
     optionGroups: [
       {
         title: "Side Dish",
@@ -126,6 +132,7 @@ const menu: MenuItem[] = [
     name: "Rice and Beans",
     price: 2000,
     image: "/images/rice-beans.png",
+    category: 'main',
     optionGroups: [
       {
         title: "Side Dish",
@@ -149,6 +156,7 @@ const menu: MenuItem[] = [
     name: "White Rice",
     price: 1000,
     image: "/images/white-rice.png",
+    category: 'main',
     optionGroups: [
       {
         title: "Sauce",
@@ -172,6 +180,7 @@ const menu: MenuItem[] = [
     name: "Fried Rice",
     price: 2000,
     image: "/images/fried-rice.png",
+    category: 'main',
     optionGroups: [
       {
         title: "Protein",
@@ -197,6 +206,7 @@ const menu: MenuItem[] = [
     name: "Jollof Rice and Fried Rice",
     price: 2000,
     image: "/images/jollof-fried.png",
+    category: 'main',
     optionGroups: [
       {
         title: "Protein",
@@ -222,6 +232,7 @@ const menu: MenuItem[] = [
     name: "Shawarma",
     price: 2000,
     image: "/images/shawarma.png",
+    category: 'main',
     optionGroups: [
       {
         title: "Type",
@@ -234,12 +245,13 @@ const menu: MenuItem[] = [
       },
     ],
   },
-  // Updated Grill Menu Items
+  // Grill Menu Items
   {
     id: 10,
     name: "Barbeque Chicken",
     price: 3000,
     image: "/images/barbeque-chicken.png",
+    category: 'grill',
     optionGroups: [
       {
         title: "Side",
@@ -256,6 +268,7 @@ const menu: MenuItem[] = [
     name: "Barbeque Turkey",
     price: 5000,
     image: "/images/barbeque-turkey.png",
+    category: 'grill',
     optionGroups: [
       {
         title: "Side",
@@ -272,6 +285,7 @@ const menu: MenuItem[] = [
     name: "Barbeque Catfish",
     price: 4000,
     image: "/images/barbeque-fish.png",
+    category: 'grill',
     optionGroups: [
       {
         title: "Size",
@@ -295,6 +309,7 @@ const menu: MenuItem[] = [
     name: "Barbeque Croaker",
     price: 7000,
     image: "/images/barbeque-croaker.png",
+    category: 'grill',
     optionGroups: [
       {
         title: "Options",
@@ -305,60 +320,69 @@ const menu: MenuItem[] = [
       },
     ],
   },
-  // New Small Chops Menu Items with corrected IDs
+  // Small Chops and Events Items
   {
     id: 14,
     name: "Puff Puff",
     price: 1000,
     image: "/images/item.png",
+    category: 'small-chops',
   },
   {
     id: 15,
     name: "Samosa",
     price: 1000,
     image: "/images/item1.png",
+    category: 'small-chops',
   },
   {
     id: 16,
     name: "Spring Rolls",
     price: 1000,
     image: "/images/item2.png",
+    category: 'small-chops',
   },
   {
     id: 17,
     name: "Chicken Kebabs",
     price: 1000,
     image: "/images/item3.png",
+    category: 'small-chops',
   },
   {
     id: 18,
     name: "Meat Pies",
     price: 1000,
     image: "/images/item4.png",
+    category: 'small-chops',
   },
   {
     id: 19,
-    name: "Meat Pies",
+    name: "Fish Rolls",
     price: 1000,
     image: "/images/item5.png",
+    category: 'small-chops',
   },
   {
     id: 20,
-    name: "Meat Pies",
+    name: "Scotch Eggs",
     price: 1000,
     image: "/images/item6.png",
+    category: 'small-chops',
   },
   {
     id: 21,
-    name: "Meat Pies",
+    name: "Plantain Chips",
     price: 1000,
     image: "/images/item7.png",
+    category: 'small-chops',
   },
   {
     id: 22,
     name: "Doughnuts",
     price: 1000,
     image: "/images/item8.png",
+    category: 'small-chops',
   },
 ];
 
@@ -409,50 +433,155 @@ const MenuPage: React.FC<MenuPageProps> = ({ cart, setCart, onShowCart }) => {
     }));
   };
 
- const handleAddToCart = (item: MenuItem) => {
-  const quantity = quantities[item.id] || 1;
-  let totalItemPrice = item.price;
-  const itemOptions: CartOption[] = [];
+  const handleAddToCart = (item: MenuItem) => {
+    const quantity = quantities[item.id] || 1;
+    let totalItemPrice = item.price;
+    const itemOptions: CartOption[] = [];
 
-  if (item.optionGroups) {
-    item.optionGroups.forEach(group => {
-      const selectedLabel =
-        selectedOptions[item.id]?.[group.title] || group.options[0].label;
-      const selectedOption = group.options.find(
-        opt => opt.label === selectedLabel
-      );
+    if (item.optionGroups && item.category !== 'small-chops') {
+      item.optionGroups.forEach(group => {
+        const selectedLabel =
+          selectedOptions[item.id]?.[group.title] || group.options[0].label;
+        const selectedOption = group.options.find(
+          opt => opt.label === selectedLabel
+        );
 
-      if (selectedOption) {
-        // Fix: if option price already represents full price (like Shawarma), replace instead of add
-        if (item.name === "Shawarma") {
-          totalItemPrice = selectedOption.price; 
-        } else {
-          totalItemPrice += selectedOption.price;
+        if (selectedOption) {
+          if (item.name === "Shawarma") {
+            totalItemPrice = selectedOption.price;
+          } else {
+            totalItemPrice += selectedOption.price;
+          }
+
+          itemOptions.push({
+            group: group.title,
+            option: selectedOption.label,
+            price: selectedOption.price,
+          });
         }
+      });
+    }
 
-        itemOptions.push({
-          group: group.title,
-          option: selectedOption.label,
-          price: selectedOption.price,
-        });
-      }
+    const optionString = itemOptions
+      .map(opt => `${opt.group}: ${opt.option}`)
+      .join(", ");
+
+    addToCart({
+      id: item.id,
+      name: item.name,
+      price: totalItemPrice,
+      quantity,
+      option: optionString,
+      image: item.image,
     });
-  }
 
-  // Fix: readable option string
-  const optionString = itemOptions
-    .map(opt => `${opt.group}: ${opt.option}`)
-    .join(", ");
+    setQuantities(prev => ({ ...prev, [item.id]: 1 }));
+    setSelectedOptions(prev => {
+      const newOptions = { ...prev };
+      delete newOptions[item.id];
+      return newOptions;
+    });
+  };
 
-  addToCart({
-    id: item.id,
-    name: item.name,
-    price: totalItemPrice,
-    quantity,
-    option: optionString, // fixed
-    image: item.image,
-  });
-};
+  const renderInteractiveItem = (item: MenuItem) => {
+    const currentPrice =
+      item.price +
+      (item.optionGroups?.reduce((total, group) => {
+        const selectedLabel =
+          selectedOptions[item.id]?.[group.title] || group.options[0].label;
+        const selectedOption = group.options.find(
+          opt => opt.label === selectedLabel
+        );
+        return total + (selectedOption ? selectedOption.price : 0);
+      }, 0) || 0);
+
+    return (
+      <li
+        key={item.id}
+        className="p-8 rounded-2xl menu-item-card flex flex-col items-center text-center"
+      >
+        <img
+          src={item.image}
+          alt={item.name}
+          className="w-full h-48 object-cover rounded-lg mb-4 shadow-inner-gold"
+        />
+        <h2 className="text-3xl font-['Playfair_Display'] font-semibold mb-2 text-[#4A4A4A]">
+          {item.name}
+        </h2>
+        <p className="text-2xl font-bold text-[#D4A017] mb-4">
+          ₦{currentPrice}
+        </p>
+
+        {item.optionGroups &&
+          item.optionGroups.map(group => (
+            <div key={group.title} className="w-full mb-4">
+              <p className="font-semibold text-[#666] mb-1">
+                {group.title}:
+              </p>
+              <select
+                className="w-full p-2 border border-gray-300 rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#D4A017] transition-all duration-200"
+                onChange={e =>
+                  handleOptionChange(item.id, group.title, e.target.value)
+                }
+                value={
+                  selectedOptions[item.id]?.[group.title] ||
+                  group.options[0].label
+                }
+              >
+                {group.options.map(option => (
+                  <option key={option.label} value={option.label}>
+                    {option.label +
+                      (option.price > 0
+                        ? " (+₦" + option.price + ")"
+                        : "")}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ))}
+
+        <div className="flex items-center space-x-4 mb-4">
+          <button
+            onClick={() => handleQuantityChange(item.id, -1)}
+            className="bg-[#D4A017] text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-xl hover:bg-[#B88C14] transition-colors"
+          >
+            -
+          </button>
+          <span className="text-xl font-semibold w-8 text-center">
+            {quantities[item.id] || 1}
+          </span>
+          <button
+            onClick={() => handleQuantityChange(item.id, 1)}
+            className="bg-[#D4A017] text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-xl hover:bg-[#B88C14] transition-colors"
+          >
+            +
+          </button>
+        </div>
+
+        <button
+          onClick={() => handleAddToCart(item)}
+          className="btn-gold-neon-capsule"
+        >
+          Add to Cart
+        </button>
+      </li>
+    );
+  };
+
+  const renderSmallChopsItem = (item: MenuItem) => {
+    return (
+      <li
+        key={item.id}
+        className="p-8 rounded-2xl menu-item-card flex flex-col items-center text-center"
+      >
+        <img
+          src={item.image}
+          alt={item.name}
+          className="w-full h-48 object-cover rounded-lg shadow-inner-gold"
+        />
+      </li>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-[#F8F4E3] text-[#1A1A1A] font-cormorant antialiased">
@@ -502,235 +631,29 @@ const MenuPage: React.FC<MenuPageProps> = ({ cart, setCart, onShowCart }) => {
           </h1>
         </div>
 
-        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {menu.slice(0, 9).map(item => {
-            const currentPrice =
-              item.price +
-              (item.optionGroups?.reduce((total, group) => {
-                const selectedLabel =
-                  selectedOptions[item.id]?.[group.title] || group.options[0].label;
-                const selectedOption = group.options.find(
-                  opt => opt.label === selectedLabel
-                );
-                return total + (selectedOption ? selectedOption.price : 0);
-              }, 0) || 0);
-
-            return (
-              <li
-                key={item.id}
-                className="p-8 rounded-2xl menu-item-card flex flex-col items-center text-center"
-              >
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-full h-48 object-cover rounded-lg mb-4 shadow-inner-gold"
-                />
-                <h2 className="text-3xl font-['Playfair_Display'] font-semibold mb-2 text-[#4A4A4A]">
-                  {item.name}
-                </h2>
-                <p className="text-2xl font-bold text-[#D4A017] mb-4">
-                  ₦{currentPrice}
-                </p>
-
-                {item.optionGroups &&
-                  item.optionGroups.map(group => (
-                    <div key={group.title} className="w-full mb-4">
-                      <p className="font-semibold text-[#666] mb-1">
-                        {group.title}:
-                      </p>
-                      <select
-                        className="w-full p-2 border border-gray-300 rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#D4A017] transition-all duration-200"
-                        onChange={e =>
-                          handleOptionChange(item.id, group.title, e.target.value)
-                        }
-                        value={
-                          selectedOptions[item.id]?.[group.title] ||
-                          group.options[0].label
-                        }
-                      >
-                        {group.options.map(option => (
-                          <option key={option.label} value={option.label}>
-                            {option.label +
-                              (option.price > 0
-                                ? " (+₦" + option.price + ")"
-                                : "")}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  ))}
-
-                <div className="flex items-center space-x-4 mb-4">
-                  <button
-                    onClick={() => handleQuantityChange(item.id, -1)}
-                    className="bg-[#D4A017] text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-xl hover:bg-[#B88C14] transition-colors"
-                  >
-                    -
-                  </button>
-                  <span className="text-xl font-semibold w-8 text-center">
-                    {quantities[item.id] || 1}
-                  </span>
-                  <button
-                    onClick={() => handleQuantityChange(item.id, 1)}
-                    className="bg-[#D4A017] text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-xl hover:bg-[#B88C14] transition-colors"
-                  >
-                    +
-                  </button>
-                </div>
-
-                <button
-                  onClick={() => handleAddToCart(item)}
-                  className="btn-gold-neon-capsule"
-                >
-                  Add to Cart
-                </button>
-              </li>
-            );
-          })}
+        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          {menu.filter(item => item.category === 'main').map(renderInteractiveItem)}
         </ul>
 
-        <div className="flex justify-center mt-16 mb-12">
+        <div className="flex justify-center mb-12">
           <h1 className="text-5xl md:text-6xl font-['Playfair_Display'] font-bold text-[#D4A017] drop-shadow-md">
             Grills
           </h1>
         </div>
-        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {menu.slice(9, 13).map(item => {
-            const currentPrice =
-              item.price +
-              (item.optionGroups?.reduce((total, group) => {
-                const selectedLabel =
-                  selectedOptions[item.id]?.[group.title] || group.options[0].label;
-                const selectedOption = group.options.find(
-                  opt => opt.label === selectedLabel
-                );
-                return total + (selectedOption ? selectedOption.price : 0);
-              }, 0) || 0);
-
-            return (
-              <li
-                key={item.id}
-                className="p-8 rounded-2xl menu-item-card flex flex-col items-center text-center"
-              >
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-full h-48 object-cover rounded-lg mb-4 shadow-inner-gold"
-                />
-                <h2 className="text-3xl font-['Playfair_Display'] font-semibold mb-2 text-[#4A4A4A]">
-                  {item.name}
-                </h2>
-                <p className="text-2xl font-bold text-[#D4A017] mb-4">
-                  ₦{currentPrice}
-                </p>
-
-                {item.optionGroups &&
-                  item.optionGroups.map(group => (
-                    <div key={group.title} className="w-full mb-4">
-                      <p className="font-semibold text-[#666] mb-1">
-                        {group.title}:
-                      </p>
-                      <select
-                        className="w-full p-2 border border-gray-300 rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#D4A017] transition-all duration-200"
-                        onChange={e =>
-                          handleOptionChange(item.id, group.title, e.target.value)
-                        }
-                        value={
-                          selectedOptions[item.id]?.[group.title] ||
-                          group.options[0].label
-                        }
-                      >
-                        {group.options.map(option => (
-                          <option key={option.label} value={option.label}>
-                            {option.label +
-                              (option.price > 0
-                                ? " (+₦" + option.price + ")"
-                                : "")}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  ))}
-
-                <div className="flex items-center space-x-4 mb-4">
-                  <button
-                    onClick={() => handleQuantityChange(item.id, -1)}
-                    className="bg-[#D4A017] text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-xl hover:bg-[#B88C14] transition-colors"
-                  >
-                    -
-                  </button>
-                  <span className="text-xl font-semibold w-8 text-center">
-                    {quantities[item.id] || 1}
-                  </span>
-                  <button
-                    onClick={() => handleQuantityChange(item.id, 1)}
-                    className="bg-[#D4A017] text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-xl hover:bg-[#B88C14] transition-colors"
-                  >
-                    +
-                  </button>
-                </div>
-
-                <button
-                  onClick={() => handleAddToCart(item)}
-                  className="btn-gold-neon-capsule"
-                >
-                  Add to Cart
-                </button>
-              </li>
-            );
-          })}
+        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          {menu.filter(item => item.category === 'grill').map(renderInteractiveItem)}
         </ul>
 
-        <div className="flex justify-center mt-16 mb-12">
+        <div className="flex justify-center mb-12">
           <h1 className="text-5xl md:text-6xl font-['Playfair_Display'] font-bold text-[#D4A017] drop-shadow-md">
             Small Chops and Events
           </h1>
         </div>
+        <p className="text-center text-lg text-[#4A4A4A] mb-8 max-w-2xl mx-auto">
+          Our selection of small chops and event items. Contact us for custom orders and pricing.
+        </p>
         <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {menu.slice(13).map(item => {
-            const currentPrice = item.price;
-            return (
-              <li
-                key={item.id}
-                className="p-8 rounded-2xl menu-item-card flex flex-col items-center text-center"
-              >
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-full h-48 object-cover rounded-lg mb-4 shadow-inner-gold"
-                />
-                <h2 className="text-3xl font-['Playfair_Display'] font-semibold mb-2 text-[#4A4A4A]">
-                  {item.name}
-                </h2>
-                <p className="text-2xl font-bold text-[#D4A017] mb-4">
-                  ₦{currentPrice}
-                </p>
-                <div className="flex items-center space-x-4 mb-4">
-                  <button
-                    onClick={() => handleQuantityChange(item.id, -1)}
-                    className="bg-[#D4A017] text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-xl hover:bg-[#B88C14] transition-colors"
-                  >
-                    -
-                  </button>
-                  <span className="text-xl font-semibold w-8 text-center">
-                    {quantities[item.id] || 1}
-                  </span>
-                  <button
-                    onClick={() => handleQuantityChange(item.id, 1)}
-                    className="bg-[#D4A017] text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-xl hover:bg-[#B88C14] transition-colors"
-                  >
-                    +
-                  </button>
-                </div>
-                <button
-                  onClick={() => handleAddToCart(item)}
-                  className="btn-gold-neon-capsule"
-                >
-                  Add to Cart
-                </button>
-              </li>
-            );
-          })}
+          {menu.filter(item => item.category === 'small-chops').map(renderSmallChopsItem)}
         </ul>
       </main>
 
@@ -748,7 +671,7 @@ const MenuPage: React.FC<MenuPageProps> = ({ cart, setCart, onShowCart }) => {
       <footer className="bg-[#F8F4E3] py-12 relative border-t border-t-[#D4A017]/30 patterned-cream-bg">
         <div className="max-w-7xl mx-auto px-6 text-center relative z-10">
           <p className="text-[#333] font-['Cormorant_Garamond'] mb-4">
-            IkeOluwa Grills & Chops &copy; 2025 | Lagos, Nigeria
+            IkeOluwa Grills & Chops © 2025 | Lagos, Nigeria
           </p>
           <div className="flex justify-center space-x-6 mb-4">
             <a href="https://instagram.com" className="social-link">
@@ -797,6 +720,12 @@ const MenuPage: React.FC<MenuPageProps> = ({ cart, setCart, onShowCart }) => {
             inset 0 0 10px rgba(255, 215, 0, 0.2);
           position: relative;
           overflow: hidden;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .menu-item-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15),
+            inset 0 0 15px rgba(255, 215, 0, 0.3);
         }
         .menu-item-card::before {
           content: "";
@@ -864,7 +793,16 @@ const CartPage: React.FC<CartPageProps> = ({
         ) : (
           <ul className="space-y-6">
             {cart.map((item, index) => {
-              const parsedOptions: CartOption[] = JSON.parse(item.option || "[]");
+              let parsedOptions: CartOption[] = [];
+              try {
+                if (item.option && item.option.trim() !== "") {
+                  parsedOptions = JSON.parse(item.option);
+                }
+              } catch {
+                parsedOptions = item.option
+                  ? [{ group: "Options", option: item.option, price: 0 }]
+                  : [];
+              }
               return (
                 <li
                   key={index}
@@ -1138,7 +1076,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
       </div>
       <style jsx>{`
         .btn-gold-neon-capsule-secondary {
-          @apply px-12 py-4 bg-transparent text-[#D4A017] font-semibold rounded-full shadow-lg transition-all duration-300 transform hover:scale-105;
+          @apply px-12jiangsu
+12 py-4 bg-transparent text-[#D4A017] font-semibold rounded-full shadow-lg transition-all duration-300 transform hover:scale-105;
           border: 2px solid #D4A017;
           box-shadow: 0 0 8px rgba(212, 160, 23, 0.5),
             inset 0 0 4px rgba(212, 160, 23, 0.5);
@@ -1205,18 +1144,28 @@ const CheckoutSuccessModal: React.FC<CheckoutSuccessModalProps> = ({
             <div className="text-left space-y-2 mb-6">
               <h4 className="text-xl font-bold text-[#D4A017]">Meal Details</h4>
               {orderInfo.orderItems.map((item, index) => {
-                const parsedOptions: CartOption[] = JSON.parse(item.option || "[]");
+                let parsedOptions: CartOption[] = [];
+                try {
+                  if (item.option && item.option.trim() !== "") {
+                    parsedOptions = JSON.parse(item.option);
+                  }
+                } catch {
+                  parsedOptions = item.option
+                    ? [{ group: "Options", option: item.option, price: 0 }]
+                    : [];
+                }
                 return (
                   <div key={index} className="border-b border-gray-300 pb-2">
                     <p className="font-semibold">
                       {item.name} x{item.quantity} - ₦{item.price * item.quantity}
                     </p>
-                    {parsedOptions.length > 0 &&
+                    {parsedOptions.length > 0 && (
                       parsedOptions.map((opt, i) => (
                         <p key={i} className="ml-4 text-sm text-gray-600">
                           {opt.group}: {opt.option} (+₦{opt.price})
                         </p>
-                      ))}
+                      ))
+                    )}
                   </div>
                 );
               })}
@@ -1226,7 +1175,7 @@ const CheckoutSuccessModal: React.FC<CheckoutSuccessModalProps> = ({
             </div>
           </>
         )}
-        <button onClick={onGoBack} className="btn-gold-neon-capsule">
+        <button onClick={onGoBack} className="btn-gold-neon-calsule">
           Got It
         </button>
       </div>
