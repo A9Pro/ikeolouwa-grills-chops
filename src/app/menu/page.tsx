@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 // Define the type for a single menu item
@@ -733,6 +734,14 @@ const MenuPage: React.FC<MenuPageProps> = ({ cart, setCart, onShowCart }) => {
         .btn-gold-neon-capsule:hover {
           box-shadow: 0 0 12px #FFD700, inset 0 0 6px #FFD700;
           background-color: #000;
+        }
+        .btn-gold-neon-capsule-secondary {
+          @apply px-8 py-3 bg-transparent text-[#D4A017] font-semibold rounded-full shadow-lg transition-all duration-300 transform hover:scale-105;
+          border: 2px solid #D4A017;
+          box-shadow: 0 0 6px rgba(212, 160, 23, 0.5), inset 0 0 3px rgba(212, 160, 23, 0.5);
+        }
+        .btn-gold-neon-capsule-secondary:hover {
+          background-color: rgba(212, 160, 23, 0.1);
         }
         .menu-item-card {
           background-color: #F8F4E3;
