@@ -1,4 +1,14 @@
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Lora:ital,wght@0,400;0,700;1,400&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Playfair+Display:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap");
+
+:root {
+  --font-playfair: 'Playfair Display', serif;
+  --font-cormorant: 'Cormorant Garamond', serif;
+  --font-lora: 'Lora', serif;
+}
 
 .font-cormorant {
   font-family: "Cormorant Garamond", serif;
@@ -7,7 +17,7 @@
   font-family: "Lora", serif;
 }
 .nav-link {
-  color: #4a4a4a;
+  color: #000000;
   transition: color 300ms;
   position: relative;
 }
@@ -52,7 +62,7 @@
   pointer-events: none;
 }
 .social-link {
-  color: #4a4a4a;
+  color: #000000;
   transition: color 300ms;
   font-size: 0.875rem;
   font-family: "Cormorant Garamond";
