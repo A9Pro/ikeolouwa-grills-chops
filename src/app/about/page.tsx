@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 const backgroundImages = [
   "/images/bg1.png",
@@ -31,7 +32,7 @@ export default function AboutContactPage() {
     setMessageBoxVisible(false);
   };
 
-  const handleFormSubmit = (e: any) => {
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const contactData = Object.fromEntries(formData.entries());
@@ -42,132 +43,15 @@ export default function AboutContactPage() {
 
   return (
     <div
-      className="antialiased bg-cover bg-center text-[#1A1A1A] transition-all duration-500"
+      className="min-h-screen bg-cover bg-center text-[#1A1A1A] transition-all duration-500 pt-16"
       style={{ backgroundImage: `url('${backgroundImage}')` }}
     >
-      <style jsx>{`
-        @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Lora:ital,wght@0,400;0,700;1,400&display=swap");
-        .font-cormorant {
-          font-family: "Cormorant Garamond", serif;
-        }
-        .font-lora {
-          font-family: "Lora", serif;
-        }
-        .nav-link {
-          color: #4a4a4a;
-          transition: color 300ms;
-          position: relative;
-        }
-        .nav-link:hover {
-          color: #d4a017;
-        }
-        .nav-link::after {
-          content: "";
-          position: absolute;
-          bottom: -5px;
-          left: 0;
-          width: 100%;
-          height: 1px;
-          background-color: #d4a017;
-          transform: scaleX(0);
-          transition: transform 300ms;
-          transform-origin: left;
-        }
-        .nav-link:hover::after {
-          transform: scaleX(1);
-        }
-        .card {
-          background-color: #f8f4e3;
-          border: 1px solid #d4a017;
-          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3),
-            inset 0 0 20px rgba(255, 215, 0, 0.4);
-          position: relative;
-          overflow: hidden;
-          border-radius: 1.5rem;
-        }
-        .card::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(
-            135deg,
-            rgba(255, 255, 255, 0.2) 0%,
-            rgba(255, 255, 255, 0) 50%,
-            rgba(255, 255, 255, 0.2) 100%
-          );
-          mix-blend-mode: overlay;
-          pointer-events: none;
-        }
-        .social-link {
-          color: #4a4a4a;
-          transition: color 300ms;
-          font-size: 0.875rem;
-          font-family: "Cormorant Garamond";
-        }
-        .social-link:hover {
-          color: #d4a017;
-        }
-        @media (max-width: 640px) {
-          .nav-link {
-            font-size: 0.8rem;
-            margin: 0 0.25rem;
-          }
-          .flex.space-x-8 {
-            flex-direction: column;
-            gap: 1rem;
-          }
-          .grid-cols-3 {
-            grid-template-columns: 1fr;
-          }
-          h1 {
-            font-size: 3rem;
-          }
-          h2 {
-            font-size: 2rem;
-          }
-          p {
-            font-size: 1rem;
-          }
-        }
-      `}</style>
-
-      {/* Navigation Bar */}
-      <nav className="fixed top-0 left-0 w-full bg-[#F8F4E3]/90 backdrop-blur-sm z-20 shadow-lg border-b border-[#D4A017]/50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <a href="/" className="group">
-            <img
-              src="/images/logo.png"
-              alt="IkeOluwa Logo"
-              className="w-16 h-16 object-contain filter drop-shadow-md"
-            />
-          </a>
-          <div className="space-x-8 text-lg font-['Cormorant_Garamond'] font-medium text-[#4A4A4A]">
-            <a href="/" className="nav-link">
-              Home
-            </a>
-            <a href="/menu" className="nav-link">
-              Menu
-            </a>
-            <a href="/reservations" className="nav-link">
-              Reservations
-            </a>
-            <a href="/about" className="nav-link">
-              About
-            </a>
-            <a href="/about" className="nav-link">
-              Contact
-            </a>
-          </div>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <main className="relative min-h-screen flex items-center justify-center p-6 overflow-hidden pt-28">
+      <main className="relative min-h-screen flex items-center justify-center p-6 overflow-hidden">
         <div className="absolute inset-0 bg-black/50 z-0"></div>
         <div className="relative w-full max-w-4xl z-10 space-y-8">
           {/* About Us Section */}
           <div className="card p-8 sm:p-12 text-center">
-            <h1 className="text-4xl sm:text-5xl font-cormorant text-[#D4A017] mb-4 drop-shadow-md">
+            <h1 className="text-4xl sm:text-5xl font-cormorant font-bold text-[#D4A017] mb-4 drop-shadow-md">
               About Us
             </h1>
             <p className="text-lg font-lora text-[#555] max-w-prose mx-auto mb-6">
@@ -175,10 +59,10 @@ export default function AboutContactPage() {
             </p>
             <p className="text-lg font-lora text-[#555] max-w-prose mx-auto mb-6">
               Our Team
-            </p>  
+            </p>
             <p className="text-lg font-lora text-[#555] max-w-prose mx-auto mb-6">
               Our team of expert chefs meticulously crafts each dish, blending traditional recipes with modern techniques to create a menu that is both familiar and exciting. At IkeOluwa Grills & Chops, we don’t just cook, we create experiences. Our specialty lies in the art of grilling, bringing out the bold, smoky flavors that only an open flame can deliver. From tender, seasoned chops to perfectly grilled cuts of meat, each dish is prepared with care, passion, and a commitment to quality. We believe food should be more than just a meal, it should be a moment to enjoy, share, and remember. That’s why we focus on freshness, rich marinades, and a balance of taste that leaves you satisfied and smiling. Whether you’re stopping by for a quick bite or planning a gathering with friends and family, At IkeOluwa Grills & Chops delivers flavor that speaks for itself. Because when it comes to good food, it’s simple: fire, flavor, and happiness on a plate.
-            </p> 
+            </p>
             <p className="text-lg font-lora text-[#555] max-w-prose mx-auto mb-6">
               Our Delivery Locations
             </p>
@@ -189,15 +73,13 @@ export default function AboutContactPage() {
 
           {/* Contact Us Section */}
           <div className="card p-8 sm:p-12">
-            <h1 className="text-4xl sm:text-5xl font-cormorant text-[#D4A017] mb-4 drop-shadow-md text-center">
+            <h1 className="text-4xl sm:text-5xl font-cormorant font-bold text-[#D4A017] mb-4 drop-shadow-md text-center">
               Contact Us
             </h1>
             <p className="text-lg font-lora text-[#555] max-w-prose mx-auto mb-8 italic text-center">
-              We'd love to hear from you. Please fill out the form below or use
-              our contact information to get in touch.
+              We'd love to hear from you. Please fill out the form below or use our contact information to get in touch.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Form */}
               <div>
                 <form onSubmit={handleFormSubmit} className="space-y-6">
                   <div>
@@ -256,8 +138,6 @@ export default function AboutContactPage() {
                   </button>
                 </form>
               </div>
-
-              {/* Contact Info */}
               <div className="text-center md:text-left space-y-4 pt-8 md:pt-0">
                 <div className="p-4 bg-[#D4A017]/10 rounded-lg border border-[#D4A017]">
                   <h3 className="text-lg font-bold text-[#D4A017] mb-2">
@@ -273,10 +153,12 @@ export default function AboutContactPage() {
                 </div>
                 <div className="p-4 bg-[#D4A017]/10 rounded-lg border border-[#D4A017]">
                   <h3 className="text-lg font-bold text-[#D4A017] mb-2">
-                    <img
+                    <Image
                       src="/images/whatsapp.png"
                       alt="WhatsApp"
-                      className="inline w-5 h-5 mr-1"
+                      width={20}
+                      height={20}
+                      className="inline mr-1"
                     />
                     WhatsApp
                   </h3>
@@ -301,10 +183,9 @@ export default function AboutContactPage() {
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="bg-[#F8F4E3] py-12 relative border-t border-t-[#D4A017]/30">
         <div className="max-w-7xl mx-auto px-6 text-center relative z-10">
-          <p className="text-[#333] font-['Cormorant_Garamond'] mb-4">
+          <p className="text-[#333] font-cormorant mb-4">
             IkeOluwa Grills & Chops &copy; 2025 | Lagos, Nigeria
           </p>
           <div className="flex justify-center space-x-6 mb-4">
@@ -321,7 +202,6 @@ export default function AboutContactPage() {
         </div>
       </footer>
 
-      {/* Message Box UI */}
       {messageBoxVisible && (
         <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#F8F4E3] text-[#1A1A1A] px-8 py-6 rounded-2xl shadow-xl transition-all duration-300 opacity-100 scale-100 z-50 border border-[#D4A017]">
           <p className="text-center font-lora mb-4">{messageText}</p>
