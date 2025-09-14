@@ -65,7 +65,7 @@ export default function Home() {
           Our Story
         </h2>
         <p className="text-lg font-cormorant text-[#4a4a4a] mb-6">
-          At IkeOluwa, we blend tradition with innovation to bring you the best of Nigerian flavors.
+          At IkeOluwa Grills & Chops, we blend tradition with innovation to bring you the best of Nigerian flavors.
         </p>
         <Link
           href="/about"

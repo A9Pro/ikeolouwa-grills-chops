@@ -12,7 +12,7 @@ export default function Header() {
     <header className="bg-[#1a1a1a] text-white fixed top-0 left-0 right-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         <Link href="/" className="text-2xl font-bold font-playfair">
-          Food Vendor
+          IkeOluwa Grills & Chops
         </Link>
         <button
           className="md:hidden text-3xl focus:outline-none"
