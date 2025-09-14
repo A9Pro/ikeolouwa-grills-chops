@@ -34,11 +34,12 @@ export default function AboutContactPage() {
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
     const contactData = Object.fromEntries(formData.entries());
     console.log("Contact form data:", contactData);
     showMessage("Thank you for your message! We'll get back to you shortly.");
-    e.target.reset();
+    form.reset();
   };
 
   return (
