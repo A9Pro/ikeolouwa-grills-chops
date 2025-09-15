@@ -586,27 +586,12 @@ const MenuPage: React.FC<MenuPageProps> = ({ cart, setCart, onShowCart }) => {
 
   const renderSmallChopsItem = (item: MenuItem) => {
     return (
-      <div
-        key={item.id}
-        className="shiny-gold-card-bg rounded-lg p-4 flex flex-col items-center text-center"
-      >
+      <div key={item.id} className="flex flex-col items-center">
         <img
           src={item.image}
           alt={item.name}
-          className="w-full h-32 sm:h-40 object-cover rounded-md mb-3"
+          className="w-full h-32 sm:h-40 object-cover rounded-md"
         />
-        <h2 className="text-lg sm:text-xl font-cormorant font-semibold text-[#1A1A1A] mb-2">
-          {item.name}
-        </h2>
-        <p className="text-base sm:text-lg font-bold text-[#D4A017] mb-3">
-          ₦{item.price}
-        </p>
-        <button
-          onClick={() => handleAddToCart(item)}
-          className="btn-gold font-lora text-xs sm:text-sm"
-        >
-          Add to Cart
-        </button>
       </div>
     );
   };
@@ -985,7 +970,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         .join("\n") +
       "\n" +
       "---\n" +
-      `Total: ₦${orderDetails.totalPrice}`;
+      `Total: ${orderDetails.totalPrice}`;
 
     try {
       console.log("Simulating sending email to:", emailRecipient);
