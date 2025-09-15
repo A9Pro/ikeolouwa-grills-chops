@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useEffect } from "react";
 
 // Define the type for a single menu item
@@ -595,233 +594,8 @@ const MenuPage: React.FC<MenuPageProps> = ({ cart, setCart, onShowCart }) => {
     );
   };
 
-  // Custom styles
-  const customStyles = `
-    .font-cormorant { font-family: 'Cormorant Garamond', serif; }
-    .font-lora { font-family: 'Lora', serif; }
-    .nav-link { color: #1A1A1A; transition: color 200ms; position: relative; }
-    .nav-link:hover { color: #D4A017; }
-    .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 100%; height: 1px; background: #D4A017; transform: scaleX(0); transition: transform 200ms; transform-origin: left; }
-    .nav-link:hover::after { transform: scaleX(1); }
-    .btn-gold { padding: 0.75rem 1.5rem; background: #D4A017; color: #1A1A1A; font-weight: 500; border-radius: 9999px; transition: all 200ms; min-height: 44px; }
-    .btn-gold:hover { background: #B88C14; transform: scale(1.02); }
-    .btn-gold-outline { padding: 0.75rem 1.5rem; border: 1px solid #D4A017; color: #D4A017; border-radius: 9999px; transition: all 200ms; min-height: 44px; }
-    .btn-gold-outline:hover { background: #D4A017; color: #1A1A1A; transform: scale(1.02); }
-    .shiny-gold-card-bg { background: #F8F4E3; border: 1px solid #D4A017/50; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    .social-link { color: #1A1A1A; transition: color 200ms; font-family: 'Cormorant Garamond', serif; }
-    .social-link:hover { color: #D4A017; }
-  `;
-
-  interface MenuPageProps {
-    cart: CartItem[];
-    setCart: React.Dispatch<React.SetStateAction<CartItem[]>>;
-    onShowCart: () => void;
-    isMenuOpen: boolean;
-    setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  }
-  
-  const MenuPage: React.FC<MenuPageProps> = ({
-    cart,
-    setCart,
-    onShowCart,
-    isMenuOpen,
-    setIsMenuOpen,
-  }) => {
-    const [quantities, setQuantities] = useState<{ [key: number]: number }>({});
-    const [selectedOptions, setSelectedOptions] = useState<{
-      [key: number]: { [key: string]: string };
-    }>({});
-    const [backgroundImage, setBackgroundImage] = useState(backgroundImages[0]);
-  
-    useEffect(() => {
-      const interval = setInterval(() => {
-        const randomIndex = Math.floor(Math.random() * backgroundImages.length);
-        setBackgroundImage(backgroundImages[randomIndex]);
-      }, 5000);
-      return () => clearInterval(interval);
-    }, []);
-  
-    const addToCart = (item: CartItem) => {
-      setCart((prevCart) => {
-        const existingItemIndex = prevCart.findIndex(
-          (cartItem) => cartItem.id === item.id && cartItem.option === item.option
-        );
-        if (existingItemIndex > -1) {
-          const newCart = [...prevCart];
-          newCart[existingItemIndex].quantity += item.quantity;
-          return newCart;
-        }
-        return [...prevCart, item];
-      });
-    };
-  
-    const handleQuantityChange = (id: number, delta: number) => {
-      setQuantities((prev) => ({
-        ...prev,
-        [id]: Math.max(1, (prev[id] || 1) + delta),
-      }));
-    };
-  
-    const handleOptionChange = (
-      itemId: number,
-      groupTitle: string,
-      optionLabel: string
-    ) => {
-      setSelectedOptions((prev) => ({
-        ...prev,
-        [itemId]: {
-          ...(prev[itemId] || {}),
-          [groupTitle]: optionLabel,
-        },
-      }));
-    };
-  
-    const handleAddToCart = (item: MenuItem) => {
-      const quantity = quantities[item.id] || 1;
-      let totalItemPrice = item.price;
-      const itemOptions: CartOption[] = [];
-  
-      if (item.optionGroups && item.category !== "small-chops") {
-        item.optionGroups.forEach((group) => {
-          const selectedLabel =
-            selectedOptions[item.id]?.[group.title] || group.options[0].label;
-          const selectedOption = group.options.find(
-            (opt) => opt.label === selectedLabel
-          );
-  
-          if (selectedOption) {
-            if (item.name === "Shawarma") {
-              totalItemPrice = selectedOption.price;
-            } else {
-              totalItemPrice += selectedOption.price;
-            }
-  
-            itemOptions.push({
-              group: group.title,
-              option: selectedOption.label,
-              price: selectedOption.price,
-            });
-          }
-        });
-      }
-  
-      const optionString = itemOptions
-        .map((opt) => `${opt.group}: ${opt.option}`)
-        .join(", ");
-  
-      addToCart({
-        id: item.id,
-        name: item.name,
-        price: totalItemPrice,
-        quantity,
-        option: optionString,
-        image: item.image,
-      });
-  
-      setQuantities((prev) => ({ ...prev, [item.id]: 1 }));
-      setSelectedOptions((prev) => {
-        const newOptions = { ...prev };
-        delete newOptions[item.id];
-        return newOptions;
-      });
-    };
-  
-    const renderInteractiveItem = (item: MenuItem) => {
-      const currentPrice =
-        item.price +
-        (item.optionGroups?.reduce((total, group) => {
-          const selectedLabel =
-            selectedOptions[item.id]?.[group.title] || group.options[0].label;
-          const selectedOption = group.options.find(
-            (opt) => opt.label === selectedLabel
-          );
-          return total + (selectedOption ? selectedOption.price : 0);
-        }, 0) || 0);
-  
-      return (
-        <div
-          key={item.id}
-          className="shiny-gold-card-bg rounded-lg p-4 flex flex-col items-center text-center"
-        >
-          <img
-            src={item.image}
-            alt={item.name}
-            className="w-full h-32 sm:h-40 object-cover rounded-md mb-3"
-          />
-          <h2 className="text-lg sm:text-xl font-cormorant font-semibold text-[#1A1A1A] mb-2">
-            {item.name}
-          </h2>
-          <p className="text-base sm:text-lg font-bold text-[#D4A017] mb-3">
-            ₦{currentPrice}
-          </p>
-  
-          {item.optionGroups &&
-            item.optionGroups.map((group) => (
-              <div key={group.title} className="w-full mb-3">
-                <p className="font-lora text-[#666] text-xs sm:text-sm mb-1">
-                  {group.title}:
-                </p>
-                <select
-                  className="w-full pl-3 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#D4A017] appearance-none sm:text-sm sm:py-3"
-                  onChange={(e) =>
-                    handleOptionChange(item.id, group.title, e.target.value)
-                  }
-                  value={
-                    selectedOptions[item.id]?.[group.title] || group.options[0].label
-                  }
-                >
-                  {group.options.map((option) => (
-                    <option key={option.label} value={option.label}>
-                      {option.label +
-                        (option.price > 0 ? ` (+₦${option.price})` : "")}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ))}
-  
-          <div className="flex items-center space-x-3 mb-3">
-            <button
-              onClick={() => handleQuantityChange(item.id, -1)}
-              className="btn-gold-outline rounded-full w-8 h-8 flex items-center justify-center font-bold text-xs sm:text-sm"
-            >
-              -
-            </button>
-            <span className="text-base sm:text-lg font-semibold w-8 text-center text-[#1A1A1A]">
-              {quantities[item.id] || 1}
-            </span>
-            <button
-              onClick={() => handleQuantityChange(item.id, 1)}
-              className="btn-gold-outline rounded-full w-8 h-8 flex items-center justify-center font-bold text-xs sm:text-sm"
-            >
-              +
-            </button>
-          </div>
-  
-          <button
-            onClick={() => handleAddToCart(item)}
-            className="btn-gold font-lora text-xs sm:text-sm"
-          >
-            Add to Cart
-          </button>
-        </div>
-      );
-    };
-  
-    const renderSmallChopsItem = (item: MenuItem) => {
-      return (
-        <div key={item.id} className="flex flex-col items-center">
-          <img
-            src={item.image}
-            alt={item.name}
-            className="w-full h-32 sm:h-40 object-cover rounded-md"
-          />
-        </div>
-      );
-    };
-
   return (
-    <div className="min-h-screen bg-white relative overflow-hidden pt-20">
+    <div className="min-h-screen bg-white relative overflow-hidden">
       {/* Background Image Overlay */}
       {backgroundImage && (
         <div
@@ -899,8 +673,6 @@ interface CartPageProps {
   onUpdateQuantity: (index: number, delta: number) => void;
   onRemoveItem: (index: number) => void;
   onProceedToCheckout: () => void;
-  isMenuOpen: boolean;
-  setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const CartPage: React.FC<CartPageProps> = ({
@@ -909,8 +681,6 @@ const CartPage: React.FC<CartPageProps> = ({
   onUpdateQuantity,
   onRemoveItem,
   onProceedToCheckout,
-  isMenuOpen,
-  setIsMenuOpen,
 }) => {
   const [backgroundImage, setBackgroundImage] = useState(backgroundImages[0]);
 
@@ -923,7 +693,7 @@ const CartPage: React.FC<CartPageProps> = ({
   }, []);
 
   return (
-    <div className="min-h-screen bg-white relative overflow-hidden pt-20">
+    <div className="min-h-screen bg-white relative overflow-hidden">
       {/* Background Image Overlay */}
       {backgroundImage && (
         <div
@@ -1052,16 +822,12 @@ interface CheckoutFormProps {
   cart: CartItem[];
   onConfirmOrder: (info: OrderInfo) => void;
   onGoBack: () => void;
-  isMenuOpen: boolean;
-  setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const CheckoutForm: React.FC<CheckoutFormProps> = ({
   cart,
   onConfirmOrder,
   onGoBack,
-  isMenuOpen,
-  setIsMenuOpen,
 }) => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -1147,7 +913,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-white relative overflow-hidden pt-20">
+    <div className="min-h-screen bg-white relative overflow-hidden">
       {/* Background Image Overlay */}
       {backgroundImage && (
         <div
@@ -1237,15 +1003,11 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
 interface CheckoutSuccessModalProps {
   orderInfo: OrderInfo | null;
   onGoBack: () => void;
-  isMenuOpen: boolean;
-  setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const CheckoutSuccessModal: React.FC<CheckoutSuccessModalProps> = ({
   orderInfo,
   onGoBack,
-  isMenuOpen,
-  setIsMenuOpen,
 }) => {
   const [backgroundImage, setBackgroundImage] = useState(backgroundImages[0]);
 
@@ -1258,7 +1020,7 @@ const CheckoutSuccessModal: React.FC<CheckoutSuccessModalProps> = ({
   }, []);
 
   return (
-    <div className="min-h-screen bg-white relative overflow-hidden pt-20">
+    <div className="min-h-screen bg-white relative overflow-hidden">
       {/* Background Image Overlay */}
       {backgroundImage && (
         <div
@@ -1268,7 +1030,7 @@ const CheckoutSuccessModal: React.FC<CheckoutSuccessModalProps> = ({
       )}
       <div className="absolute inset-0 bg-black/10" />
 
-      <div className="relative z-10 flex items-center justify-center p-4 min-h-[calc(100vh-5rem)]">
+      <div className="relative z-10 flex items-center justify-center p-4 min-h-screen">
         <div className="shiny-gold-card-bg rounded-lg p-4 text-center w-full max-w-sm sm:max-w-md max-h-[80vh] overflow-y-auto">
           <h3 className="text-2xl sm:text-3xl font-cormorant font-bold text-[#1A1A1A] mb-3">
             Order Placed!
@@ -1360,7 +1122,6 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState("menu");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [orderInfo, setOrderInfo] = useState<OrderInfo | null>(null);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleUpdateQuantity = (index: number, delta: number) => {
     setCart((prevCart) => {
@@ -1405,10 +1166,6 @@ export default function App() {
         {`
           .font-cormorant { font-family: 'Cormorant Garamond', serif; }
           .font-lora { font-family: 'Lora', serif; }
-          .nav-link { color: #1A1A1A; transition: color 200ms; position: relative; }
-          .nav-link:hover { color: #D4A017; }
-          .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 100%; height: 1px; background: #D4A017; transform: scaleX(0); transition: transform 200ms; transform-origin: left; }
-          .nav-link:hover::after { transform: scaleX(1); }
           .btn-gold { padding: 0.75rem 1.5rem; background: #D4A017; color: #1A1A1A; font-weight: 500; border-radius: 9999px; transition: all 200ms; min-height: 44px; }
           .btn-gold:hover { background: #B88C14; transform: scale(1.02); }
           .btn-gold-outline { padding: 0.75rem 1.5rem; border: 1px solid #D4A017; color: #D4A017; border-radius: 9999px; transition: all 200ms; min-height: 44px; }
@@ -1418,64 +1175,11 @@ export default function App() {
           .social-link:hover { color: #D4A017; }
         `}
       </style>
-      <nav className="fixed top-0 left-0 w-full bg-[#F8F4E3]/95 backdrop-blur-sm z-20 border-b border-[#D4A017]/50">
-        <div className="max-w-sm mx-auto px-4 py-3 flex justify-between items-center sm:max-w-md sm:px-6">
-          <Link href="/" className="group">
-            <img
-              src="/images/logo.png"
-              alt="IkeOluwa Logo"
-              className="w-10 h-10 object-contain"
-            />
-          </Link>
-          <button
-            className="md:hidden text-[#1A1A1A] focus:outline-none"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
-              ></path>
-            </svg>
-          </button>
-          <div
-            className={`${
-              isMenuOpen ? "flex" : "hidden"
-            } flex-col absolute top-12 left-0 w-full bg-[#F8F4E3]/95 p-4 shadow-md z-10 md:flex md:flex-row md:static md:space-x-4 md:p-0 md:shadow-none`}
-          >
-            <Link href="/" className="nav-link py-2 text-xs sm:text-sm">
-              Home
-            </Link>
-            <Link href="/menu" className="nav-link py-2 text-xs sm:text-sm">
-              Menu
-            </Link>
-            <Link href="/reservations" className="nav-link py-2 text-xs sm:text-sm">
-              Reservations
-            </Link>
-            <Link href="/about" className="nav-link py-2 text-xs sm:text-sm">
-              About
-            </Link>
-            <Link href="/contact" className="nav-link py-2 text-xs sm:text-sm">
-              Contact
-            </Link>
-          </div>
-        </div>
-      </nav>
       {currentPage === "menu" && (
         <MenuPage
           cart={cart}
           setCart={setCart}
           onShowCart={() => setCurrentPage("cart")}
-          isMenuOpen={isMenuOpen}
-          setIsMenuOpen={setIsMenuOpen}
         />
       )}
       {currentPage === "cart" && (
@@ -1485,8 +1189,6 @@ export default function App() {
           onUpdateQuantity={handleUpdateQuantity}
           onRemoveItem={handleRemoveItem}
           onProceedToCheckout={handleProceedToCheckout}
-          isMenuOpen={isMenuOpen}
-          setIsMenuOpen={setIsMenuOpen}
         />
       )}
       {currentPage === "checkout" && (
@@ -1494,16 +1196,12 @@ export default function App() {
           cart={cart}
           onConfirmOrder={handleConfirmOrder}
           onGoBack={() => setCurrentPage("cart")}
-          isMenuOpen={isMenuOpen}
-          setIsMenuOpen={setIsMenuOpen}
         />
       )}
       {showSuccessModal && (
         <CheckoutSuccessModal
           orderInfo={orderInfo}
           onGoBack={handleGoBackFromModal}
-          isMenuOpen={isMenuOpen}
-          setIsMenuOpen={setIsMenuOpen}
         />
       )}
     </>
