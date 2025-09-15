@@ -281,7 +281,7 @@ const MealBookingPage = () => {
                   </p>
                   <div className="mt-2 p-2 bg-green-50 rounded-md">
                     <p className="text-green-800 font-medium text-xs sm:text-sm">
-                      🚚 Free Delivery in Lagos • Ready in 45-60 min
+                      🚚 Free Delivery in Asese, Maba, Mowe, Olowotedo, Ascon, Magboro, Ibafo, Arepo • Ready in 45-60 min
                     </p>
                   </div>
                 </div>
@@ -344,7 +344,7 @@ const MealBookingPage = () => {
                       value={formFields.deliveryAddress}
                       onChange={handleFormChange}
                       required
-                      placeholder="Delivery Address in Lagos"
+                      placeholder="Delivery Address"
                       rows={3}
                       className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] resize-none sm:text-sm sm:pl-9 sm:py-3"
                     />
