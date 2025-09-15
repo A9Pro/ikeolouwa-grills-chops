@@ -45,24 +45,24 @@ const CountdownTimer = ({ targetDate }: { targetDate: string | Date }) => {
 
   if (timeRemaining.isExpired) {
     return (
-      <div className="text-red-500 font-semibold text-center mt-4 text-sm">
+      <div className="text-red-500 font-semibold text-center mt-3 text-xs sm:text-sm">
         Delivery Time Has Passed
       </div>
     );
   }
 
   return (
-    <div className="mt-4">
-      <p className="text-xs text-[#666] mb-2 font-lora text-center">
+    <div className="mt-3">
+      <p className="text-xs text-[#666] mb-2 font-lora text-center sm:text-sm">
         Time until your meal delivery:
       </p>
       <div className="grid grid-cols-4 gap-2 text-center">
         {["days", "hours", "minutes", "seconds"].map((unit, i) => (
           <div
             key={i}
-            className="bg-[#D4A017]/10 rounded-lg p-2 border border-[#D4A017]/50"
+            className="bg-[#D4A017]/10 rounded-md p-2 border border-[#D4A017]/30"
           >
-            <div className="text-lg font-bold text-[#D4A017]">
+            <div className="text-base font-bold text-[#D4A017] sm:text-lg">
               {timeRemaining[unit as keyof typeof timeRemaining]}
             </div>
             <div className="text-xs text-[#666] font-lora">
@@ -243,53 +243,53 @@ const MealBookingPage = () => {
   const customStyles = `
     .font-cormorant { font-family: 'Cormorant Garamond', serif; }
     .font-lora { font-family: 'Lora', serif; }
-    .nav-link { color: #4A4A4A; transition: color 200ms; position: relative; }
+    .nav-link { color: #1A1A1A; transition: color 200ms; position: relative; }
     .nav-link:hover { color: #D4A017; }
     .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 100%; height: 1px; background: #D4A017; transform: scaleX(0); transition: transform 200ms; transform-origin: left; }
     .nav-link:hover::after { transform: scaleX(1); }
-    .btn-gold { padding: 0.75rem 2rem; background: #D4A017; color: #1A1A1A; font-weight: 600; border-radius: 9999px; transition: all 200ms; }
-    .btn-gold:hover { background: #B88C14; transform: scale(1.03); }
-    .btn-gold-outline { padding: 0.75rem 2rem; border: 2px solid #D4A017; color: #D4A017; border-radius: 9999px; transition: all 200ms; }
-    .btn-gold-outline:hover { background: #D4A017; color: #1A1A1A; transform: scale(1.03); }
-    .shiny-gold-card-bg { background: #F8F4E3; border: 1px solid #D4A017; box-shadow: 0 4px 20px rgba(0,0,0,0.15), inset 0 0 10px rgba(255,215,0,0.2); }
+    .btn-gold { padding: 0.75rem 1.5rem; background: #D4A017; color: #1A1A1A; font-weight: 500; border-radius: 9999px; transition: all 200ms; min-height: 44px; }
+    .btn-gold:hover { background: #B88C14; transform: scale(1.02); }
+    .btn-gold-outline { padding: 0.75rem 1.5rem; border: 1px solid #D4A017; color: #D4A017; border-radius: 9999px; transition: all 200ms; min-height: 44px; }
+    .btn-gold-outline:hover { background: #D4A017; color: #1A1A1A; transform: scale(1.02); }
+    .shiny-gold-card-bg { background: #F8F4E3; border: 1px solid #D4A017/50; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
   `;
 
   return (
     <>
       <style>{customStyles}</style>
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 relative overflow-hidden pt-20">
+      <div className="min-h-screen bg-white relative overflow-hidden pt-20">
         {/* Background Image Overlay */}
         {backgroundImage && (
           <div
-            className="absolute inset-0 bg-cover bg-center opacity-10 transition-opacity duration-500"
+            className="absolute inset-0 bg-cover bg-center opacity-30 transition-opacity duration-300"
             style={{ backgroundImage: `url(${backgroundImage})` }}
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-50/90 to-red-50/90" />
+        <div className="absolute inset-0 bg-white/70" />
 
         {/* Main Content */}
-        <div className="relative z-10 container mx-auto px-4 py-6">
+        <div className="relative z-10 container mx-auto px-4 py-6 sm:px-6">
           {view === "form" && (
-            <div className="max-w-md mx-auto">
-              <div className="shiny-gold-card-bg rounded-xl p-6 shadow-lg">
-                <div className="text-center mb-6">
-                  <h1 className="font-cormorant text-3xl font-bold text-[#1A1A1A] mb-2 sm:text-4xl">
+            <div className="max-w-sm mx-auto sm:max-w-md">
+              <div className="shiny-gold-card-bg rounded-lg p-5 sm:p-6">
+                <div className="text-center mb-5">
+                  <h1 className="font-cormorant text-2xl font-bold text-[#1A1A1A] mb-2 sm:text-3xl">
                     {formFields.id ? "Update Your Order" : "Book Your Meal"}
                   </h1>
-                  <p className="font-lora text-[#666] text-sm leading-relaxed sm:text-base">
-                    Pre-order your favorite grills and chops for delivery at your preferred date and time.
+                  <p className="font-lora text-[#666] text-xs leading-relaxed sm:text-sm">
+                    Pre-order your favorite grills and chops for delivery.
                   </p>
-                  <div className="mt-3 p-2 bg-green-100 rounded-lg">
-                    <p className="text-green-800 font-semibold text-xs sm:text-sm">
-                      🚚 Free Delivery within Lagos • Ready in 45-60 min
+                  <div className="mt-2 p-2 bg-green-50 rounded-md">
+                    <p className="text-green-800 font-medium text-xs sm:text-sm">
+                      🚚 Free Delivery in Lagos • Ready in 45-60 min
                     </p>
                   </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-3">
                   {/* Full Name */}
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#D4A017] text-base">
+                    <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-[#D4A017] text-sm sm:text-base">
                       👤
                     </span>
                     <input
@@ -299,13 +299,13 @@ const MealBookingPage = () => {
                       onChange={handleFormChange}
                       required
                       placeholder="Full Name"
-                      className="w-full pl-10 pr-4 py-3 border border-[#D4A017] rounded-lg bg-white/90 font-lora text-sm placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] transition-colors sm:text-base"
+                      className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] sm:text-sm sm:pl-9 sm:py-3"
                     />
                   </div>
 
                   {/* Email Address */}
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#D4A017] text-base">
+                    <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-[#D4A017] text-sm sm:text-base">
                       ✉️
                     </span>
                     <input
@@ -314,13 +314,13 @@ const MealBookingPage = () => {
                       value={formFields.email}
                       onChange={handleFormChange}
                       placeholder="Email Address (optional)"
-                      className="w-full pl-10 pr-4 py-3 border border-[#D4A017] rounded-lg bg-white/90 font-lora text-sm placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] transition-colors sm:text-base"
+                      className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] sm:text-sm sm:pl-9 sm:py-3"
                     />
                   </div>
 
                   {/* Phone Number */}
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#D4A017] text-base">
+                    <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-[#D4A017] text-sm sm:text-base">
                       📞
                     </span>
                     <input
@@ -330,13 +330,13 @@ const MealBookingPage = () => {
                       onChange={handleFormChange}
                       required
                       placeholder="Phone Number"
-                      className="w-full pl-10 pr-4 py-3 border border-[#D4A017] rounded-lg bg-white/90 font-lora text-sm placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] transition-colors sm:text-base"
+                      className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] sm:text-sm sm:pl-9 sm:py-3"
                     />
                   </div>
 
                   {/* Delivery Address */}
                   <div className="relative">
-                    <span className="absolute left-3 top-4 text-[#D4A017] text-base">
+                    <span className="absolute left-2 top-3 text-[#D4A017] text-sm sm:text-base">
                       📍
                     </span>
                     <textarea
@@ -346,14 +346,14 @@ const MealBookingPage = () => {
                       required
                       placeholder="Delivery Address in Lagos"
                       rows={3}
-                      className="w-full pl-10 pr-4 py-3 border border-[#D4A017] rounded-lg bg-white/90 font-lora text-sm placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] transition-colors resize-none sm:text-base"
+                      className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] resize-none sm:text-sm sm:pl-9 sm:py-3"
                     />
                   </div>
 
                   {/* Date and Time */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#D4A017] text-base">
+                      <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-[#D4A017] text-sm sm:text-base">
                         📅
                       </span>
                       <input
@@ -363,11 +363,11 @@ const MealBookingPage = () => {
                         onChange={handleFormChange}
                         required
                         min={new Date().toISOString().split("T")[0]}
-                        className="w-full pl-10 pr-4 py-3 border border-[#D4A017] rounded-lg bg-white/90 font-lora text-sm focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] transition-colors sm:text-base"
+                        className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] sm:text-sm sm:pl-9 sm:py-3"
                       />
                     </div>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#D4A017] text-base">
+                      <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-[#D4A017] text-sm sm:text-base">
                         ⏰
                       </span>
                       <select
@@ -375,7 +375,7 @@ const MealBookingPage = () => {
                         value={formFields.time}
                         onChange={handleFormChange}
                         required
-                        className="w-full pl-10 pr-4 py-3 border border-[#D4A017] rounded-lg bg-white/90 font-lora text-sm focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] transition-colors appearance-none sm:text-base"
+                        className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] appearance-none sm:text-sm sm:pl-9 sm:py-3"
                       >
                         <option value="">Select Time</option>
                         {Array.from({ length: 48 }, (_, i) => {
@@ -394,7 +394,7 @@ const MealBookingPage = () => {
 
                   {/* Number of Meals */}
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#D4A017] text-base">
+                    <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-[#D4A017] text-sm sm:text-base">
                       🍽️
                     </span>
                     <input
@@ -406,13 +406,13 @@ const MealBookingPage = () => {
                       max="20"
                       required
                       placeholder="Number of Meals"
-                      className="w-full pl-10 pr-4 py-3 border border-[#D4A017] rounded-lg bg-white/90 font-lora text-sm placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] transition-colors sm:text-base"
+                      className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] sm:text-sm sm:pl-9 sm:py-3"
                     />
                   </div>
 
                   {/* Special Instructions */}
                   <div className="relative">
-                    <span className="absolute left-3 top-4 text-[#D4A017] text-base">
+                    <span className="absolute left-2 top-3 text-[#D4A017] text-sm sm:text-base">
                       📝
                     </span>
                     <textarea
@@ -421,14 +421,14 @@ const MealBookingPage = () => {
                       onChange={handleFormChange}
                       placeholder="Special Instructions (e.g., dietary preferences)"
                       rows={3}
-                      className="w-full pl-10 pr-4 py-3 border border-[#D4A017] rounded-lg bg-white/90 font-lora text-sm placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] transition-colors resize-none sm:text-base"
+                      className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] resize-none sm:text-sm sm:pl-9 sm:py-3"
                     />
                   </div>
 
                   {/* Submit Button */}
                   <button
                     type="submit"
-                    className="w-full btn-gold font-lora text-sm sm:text-base"
+                    className="w-full btn-gold font-lora text-xs sm:text-sm"
                   >
                     {formFields.id ? "Update Order" : "Confirm Booking"}
                   </button>
@@ -438,32 +438,32 @@ const MealBookingPage = () => {
           )}
 
           {view === "success" && currentOrder && (
-            <div className="max-w-md mx-auto">
-              <div className="shiny-gold-card-bg rounded-xl p-6 shadow-lg text-center">
-                <div className="text-5xl mb-4">🎉</div>
-                <h2 className="font-cormorant text-2xl font-bold text-[#1A1A1A] mb-3 sm:text-3xl">
+            <div className="max-w-sm mx-auto sm:max-w-md">
+              <div className="shiny-gold-card-bg rounded-lg p-5 sm:p-6 text-center">
+                <div className="text-4xl mb-3 sm:text-5xl">🎉</div>
+                <h2 className="font-cormorant text-xl font-bold text-[#1A1A1A] mb-2 sm:text-2xl">
                   Order Confirmed!
                 </h2>
-                <p className="font-lora text-[#666] text-sm mb-4 sm:text-base">
-                  Your meal booking is confirmed. We'll contact you soon to discuss menu and payment.
+                <p className="font-lora text-[#666] text-xs mb-3 sm:text-sm">
+                  Your meal booking is confirmed. We'll contact you soon.
                 </p>
 
-                <div className="bg-white/70 rounded-lg p-4 mb-4 text-left">
-                  <div className="space-y-2 text-sm sm:text-base">
+                <div className="bg-white/95 rounded-md p-3 mb-3 text-left sm:p-4">
+                  <div className="space-y-2 text-xs sm:text-sm">
                     <div className="flex justify-between">
-                      <span className="font-semibold text-[#666]">Order ID:</span>
+                      <span className="font-medium text-[#666]">Order ID:</span>
                       <span className="font-bold text-[#D4A017]">{currentOrder.id}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="font-semibold text-[#666]">Name:</span>
+                      <span className="font-medium text-[#666]">Name:</span>
                       <span className="text-[#1A1A1A]">{currentOrder.name}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="font-semibold text-[#666]">Phone:</span>
+                      <span className="font-medium text-[#666]">Phone:</span>
                       <span className="text-[#1A1A1A]">{currentOrder.phone}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="font-semibold text-[#666]">Delivery Date:</span>
+                      <span className="font-medium text-[#666]">Delivery Date:</span>
                       <span className="text-[#1A1A1A]">
                         {new Date(currentOrder.date).toLocaleDateString("en-US", {
                           weekday: "long",
@@ -474,17 +474,17 @@ const MealBookingPage = () => {
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="font-semibold text-[#666]">Delivery Time:</span>
+                      <span className="font-medium text-[#666]">Delivery Time:</span>
                       <span className="text-[#1A1A1A]">{currentOrder.time}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="font-semibold text-[#666]">Meals:</span>
+                      <span className="font-medium text-[#666]">Meals:</span>
                       <span className="text-[#1A1A1A]">{currentOrder.mealQuantity}</span>
                     </div>
                     {currentOrder.specialInstructions && (
                       <div className="pt-2 border-t border-[#D4A017]/20">
-                        <span className="font-semibold text-[#666]">Special Instructions:</span>
-                        <p className="text-[#1A1A1A] mt-1 text-sm sm:text-base">
+                        <span className="font-medium text-[#666]">Special Instructions:</span>
+                        <p className="text-[#1A1A1A] mt-1 text-xs sm:text-sm">
                           {currentOrder.specialInstructions}
                         </p>
                       </div>
@@ -494,23 +494,23 @@ const MealBookingPage = () => {
 
                 <CountdownTimer targetDate={currentOrder.dateTime} />
 
-                <div className="flex gap-3 mt-6">
+                <div className="flex gap-2 mt-4 sm:gap-3">
                   <button
                     onClick={handleEditOrder}
-                    className="flex-1 btn-gold-outline font-lora text-sm sm:text-base"
+                    className="flex-1 btn-gold-outline font-lora text-xs sm:text-sm"
                   >
                     Edit Order
                   </button>
                   <button
                     onClick={handleMakeAnother}
-                    className="flex-1 btn-gold font-lora text-sm sm:text-base"
+                    className="flex-1 btn-gold font-lora text-xs sm:text-sm"
                   >
                     New Booking
                   </button>
                 </div>
 
-                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                  <p className="text-blue-800 text-xs font-semibold sm:text-sm">
+                <div className="mt-3 p-2 bg-blue-50 rounded-md sm:p-3">
+                  <p className="text-blue-800 text-xs font-medium sm:text-sm">
                     📱 We'll call you to confirm menu and delivery details
                   </p>
                   <p className="text-blue-700 text-xs mt-1 sm:text-sm">
@@ -522,20 +522,20 @@ const MealBookingPage = () => {
           )}
 
           {view === "tracking" && (
-            <div className="max-w-md mx-auto">
-              <div className="shiny-gold-card-bg rounded-xl p-6 shadow-lg">
-                <div className="text-center mb-6">
-                  <h2 className="font-cormorant text-2xl font-bold text-[#1A1A1A] mb-2 sm:text-3xl">
+            <div className="max-w-sm mx-auto sm:max-w-md">
+              <div className="shiny-gold-card-bg rounded-lg p-5 sm:p-6">
+                <div className="text-center mb-5">
+                  <h2 className="font-cormorant text-xl font-bold text-[#1A1A1A] mb-2 sm:text-2xl">
                     Track Your Order
                   </h2>
-                  <p className="font-lora text-[#666] text-sm sm:text-base">
+                  <p className="font-lora text-[#666] text-xs sm:text-sm">
                     Enter your order ID to view booking details
                   </p>
                 </div>
 
-                <form onSubmit={handleTrackSubmit} className="space-y-4">
+                <form onSubmit={handleTrackSubmit} className="space-y-3">
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#D4A017] text-base">
+                    <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-[#D4A017] text-sm sm:text-base">
                       🔍
                     </span>
                     <input
@@ -544,26 +544,26 @@ const MealBookingPage = () => {
                       onChange={(e) => setTrackingId(e.target.value)}
                       required
                       placeholder="Order ID (e.g., IG-1234)"
-                      className="w-full pl-10 pr-4 py-3 border border-[#D4A017] rounded-lg bg-white/90 font-lora text-sm placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] transition-colors uppercase sm:text-base"
+                      className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] uppercase sm:text-sm sm:pl-9 sm:py-3"
                     />
                   </div>
 
                   {trackingError && (
-                    <div className="text-red-500 text-center font-lora text-xs bg-red-50 p-2 rounded-lg sm:text-sm">
+                    <div className="text-red-500 text-center font-lora text-xs bg-red-50 p-2 rounded-md sm:text-sm">
                       {trackingError}
                     </div>
                   )}
 
                   <button
                     type="submit"
-                    className="w-full btn-gold font-lora text-sm sm:text-base"
+                    className="w-full btn-gold font-lora text-xs sm:text-sm"
                   >
                     Track Order
                   </button>
                   <button
                     type="button"
                     onClick={() => setView("form")}
-                    className="w-full btn-gold-outline font-lora text-sm sm:text-base"
+                    className="w-full btn-gold-outline font-lora text-xs sm:text-sm"
                   >
                     ← Back to Booking
                   </button>
@@ -577,7 +577,7 @@ const MealBookingPage = () => {
         {view !== "tracking" && (
           <button
             onClick={() => setView("tracking")}
-            className="fixed bottom-4 right-4 bg-[#D4A017] text-[#1A1A1A] px-4 py-2 rounded-full font-lora text-sm font-semibold shadow-lg hover:bg-[#B88C14] transition-colors z-20 sm:text-base sm:px-6 sm:py-3"
+            className="fixed bottom-3 right-3 bg-[#D4A017] text-[#1A1A1A] px-3 py-2 rounded-full font-lora text-xs font-medium shadow-md hover:bg-[#B88C14] transition-colors z-20 sm:text-sm sm:px-4 sm:py-2.5"
           >
             🔍 Track Order
           </button>
