@@ -854,61 +854,77 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
     if (!name || !phone || !address) {
       setError("All fields are mandatory.");
+      setLoading(false);
       return;
     }
 
     if (!validatePhone(phone)) {
       setError("Please enter a valid 11-digit phone number.");
+      setLoading(false);
       return;
     }
 
     setLoading(true);
 
-    const orderNumber = generateOrderNumber();
-
-    const orderDetails: OrderInfo = {
-      customerName: name,
-      customerPhone: phone,
-      customerAddress: address,
-      orderItems: cart,
-      totalPrice: cart.reduce((total, item) => total + item.price * item.quantity, 0),
-      orderNumber: orderNumber,
-    };
-
-    const emailRecipient = "adejaretalabi@gmail.com";
-    const phoneRecipient = "08132791933";
-
-    const orderMessage =
-      "New Order Details:\n" +
-      `Order Number: ${orderDetails.orderNumber}\n` +
-      `Name: ${orderDetails.customerName}\n` +
-      `Phone: ${orderDetails.customerPhone}\n` +
-      `Address: ${orderDetails.customerAddress}\n` +
-      `Time: ${new Date().toLocaleString()}\n` +
-      "---\n" +
-      "Order Summary:\n" +
-      orderDetails.orderItems
-        .map(
-          (item) =>
-            `- ${item.name} x${item.quantity} (₦${item.price * item.quantity})`
-        )
-        .join("\n") +
-      "\n" +
-      "---\n" +
-      `Total: ₦${orderDetails.totalPrice}`;
-
     try {
-      console.log("Simulating sending email to:", emailRecipient);
-      console.log("Simulating sending SMS to:", phoneRecipient);
-      console.log("Order Details:", orderMessage);
+      const orderNumber = generateOrderNumber();
 
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const orderDetails: OrderInfo = {
+        customerName: name,
+        customerPhone: phone,
+        customerAddress: address,
+        orderItems: cart,
+        totalPrice: cart.reduce((total, item) => total + item.price * item.quantity, 0),
+        orderNumber: orderNumber,
+      };
+
+      const emailRecipient = "adejaretalabi@gmail.com";
+      const phoneRecipient = "08132791933";
+
+      const orderMessage =
+        "New Order Details:\n" +
+        `Order Number: ${orderDetails.orderNumber}\n` +
+        `Name: ${orderDetails.customerName}\n` +
+        `Phone: ${orderDetails.customerPhone}\n` +
+        `Address: ${orderDetails.customerAddress}\n` +
+        `Time: ${new Date().toLocaleString()}\n` +
+        "---\n" +
+        "Order Summary:\n" +
+        orderDetails.orderItems
+          .map(
+            (item) =>
+              `- ${item.name} x${item.quantity} (₦${item.price * item.quantity})`
+          )
+          .join("\n") +
+        "\n" +
+        "---\n" +
+        `Total: ₦${orderDetails.totalPrice}`;
+
+      console.log("Sending order details...");
+      console.log("Email recipient:", emailRecipient);
+      console.log("Phone recipient:", phoneRecipient);
+      console.log("Order message:", orderMessage);
+
+      // Simulate async processing
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          try {
+            resolve("Order processed successfully");
+          } catch (err) {
+            reject(new Error("Simulated processing error"));
+          }
+        }, 2000);
+      });
+
+      console.log("Calling onConfirmOrder with orderDetails:", orderDetails);
       onConfirmOrder(orderDetails);
+      console.log("Order confirmation triggered successfully");
     } catch (err) {
-      console.error("Failed to place order:", err);
+      console.error("Error in order processing:", err);
       setError("Failed to place order. Please try again.");
     } finally {
       setLoading(false);
+      console.log("Loading state reset to false");
     }
   };
 
@@ -1149,12 +1165,16 @@ export default function App() {
   };
 
   const handleConfirmOrder = (info: OrderInfo) => {
+    console.log("handleConfirmOrder called with info:", info);
     setOrderInfo(info);
     setCart([]);
     setShowSuccessModal(true);
+    setCurrentPage("menu"); // Ensure currentPage is reset
+    console.log("State updated: showSuccessModal=true, cart cleared, currentPage=menu");
   };
 
   const handleGoBackFromModal = () => {
+    console.log("handleGoBackFromModal called");
     setShowSuccessModal(false);
     setOrderInfo(null);
     setCurrentPage("menu");
