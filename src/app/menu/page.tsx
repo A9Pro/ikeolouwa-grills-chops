@@ -515,7 +515,7 @@ const MenuPage: React.FC<MenuPageProps> = ({ cart, setCart, onShowCart }) => {
       }, 0) || 0);
 
     return (
-      <div
+      <li
         key={item.id}
         className="shiny-gold-card-bg rounded-lg p-4 flex flex-col items-center text-center"
       >
@@ -580,19 +580,34 @@ const MenuPage: React.FC<MenuPageProps> = ({ cart, setCart, onShowCart }) => {
         >
           Add to Cart
         </button>
-      </div>
+      </li>
     );
   };
 
   const renderSmallChopsItem = (item: MenuItem) => {
     return (
-      <div key={item.id} className="flex flex-col items-center">
+      <li
+        key={item.id}
+        className="shiny-gold-card-bg rounded-lg p-4 flex flex-col items-center text-center"
+      >
         <img
           src={item.image}
           alt={item.name}
-          className="w-full h-32 sm:h-40 object-cover rounded-md"
+          className="w-full h-32 sm:h-40 object-cover rounded-md mb-3"
         />
-      </div>
+        <h2 className="text-lg sm:text-xl font-cormorant font-semibold text-[#1A1A1A] mb-2">
+          {item.name}
+        </h2>
+        <p className="text-base sm:text-lg font-bold text-[#D4A017] mb-3">
+          ₦{item.price}
+        </p>
+        <button
+          onClick={() => handleAddToCart(item)}
+          className="btn-gold font-lora text-xs sm:text-sm"
+        >
+          Add to Cart
+        </button>
+      </li>
     );
   };
 
@@ -685,16 +700,16 @@ const MenuPage: React.FC<MenuPageProps> = ({ cart, setCart, onShowCart }) => {
             <h1 className="text-2xl sm:text-3xl font-cormorant font-bold text-[#1A1A1A] text-center mb-6">
               Our Menu
             </h1>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+            <ul className="grid grid-cols-1 gap-4 mb-8">
               {menu.filter((item) => item.category === "main").map(renderInteractiveItem)}
-            </div>
+            </ul>
 
             <h1 className="text-2xl sm:text-3xl font-cormorant font-bold text-[#1A1A1A] text-center mb-6">
               Grills
             </h1>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+            <ul className="grid grid-cols-1 gap-4 mb-8">
               {menu.filter((item) => item.category === "grill").map(renderInteractiveItem)}
-            </div>
+            </ul>
 
             <h1 className="text-2xl sm:text-3xl font-cormorant font-bold text-[#1A1A1A] text-center mb-6">
               Small Chops and Events
@@ -702,9 +717,9 @@ const MenuPage: React.FC<MenuPageProps> = ({ cart, setCart, onShowCart }) => {
             <p className="font-lora text-[#666] text-xs sm:text-sm text-center mb-4">
               Our selection of small chops and event items. Contact us for custom orders and pricing.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <ul className="grid grid-cols-1 gap-4">
               {menu.filter((item) => item.category === "small-chops").map(renderSmallChopsItem)}
-            </div>
+            </ul>
           </div>
         </main>
 
@@ -779,113 +794,110 @@ const CartPage: React.FC<CartPageProps> = ({
       <div className="absolute inset-0 bg-black/10" />
 
       <div className="relative z-10 container mx-auto px-4 py-6 sm:px-6">
-        <div className="max-w-sm mx-auto sm:max-w-md shiny-gold-card-bg rounded-lg p-5 sm:p-6">
-          <h2 className="text-2xl sm:text-3xl font-cormorant font-bold text-[#1A1A1A] mb-4 text-center">
-            Your Cart
-          </h2>
-          {cart.length === 0 ? (
-            <p className="font-lora text-[#666] text-xs sm:text-sm text-center">
-              Your cart is empty.
-            </p>
-          ) : (
-            <div className="space-y-4">
-              {cart.map((item, index) => {
-                let parsedOptions: CartOption[] = [];
-                try {
-                  if (item.option && item.option.trim() !== "") {
+        <div className="max-w-sm mx-auto sm:max-w-md">
+          <div className="shiny-gold-card-bg rounded-lg p-5 sm:p-6">
+            <h2 className="text-2xl sm:text-3xl font-cormorant font-bold text-[#1A1A1A] mb-4 text-center">
+              Your Cart
+            </h2>
+            {cart.length === 0 ? (
+              <p className="font-lora text-[#666] text-xs sm:text-sm text-center">
+                Your cart is empty.
+              </p>
+            ) : (
+              <ul className="space-y-4">
+                {cart.map((item, index) => {
+                  let parsedOptions: CartOption[] = [];
+                  try {
+                    if (item.option && item.option.trim() !== "") {
+                      parsedOptions = JSON.parse(item.option);
+                    }
+                  } catch {
                     parsedOptions = item.option
-                      .split(", ")
-                      .map((opt) => {
-                        const [group, option] = opt.split(": ");
-                        return { group, option, price: 0 };
-                      });
+                      ? [{ group: "Options", option: item.option, price: 0 }]
+                      : [];
                   }
-                } catch {
-                  parsedOptions = item.option
-                    ? [{ group: "Options", option: item.option, price: 0 }]
-                    : [];
-                }
-                return (
-                  <div
-                    key={index}
-                    className="flex flex-col border-b border-[#D4A017]/30 pb-3"
-                  >
-                    <div className="flex items-center w-full mb-3">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-16 h-16 object-cover rounded-md mr-3"
-                      />
-                      <div className="text-left flex-1">
-                        <p className="font-cormorant text-base sm:text-lg font-semibold text-[#1A1A1A]">
-                          {item.name}
-                        </p>
-                        {parsedOptions.length > 0 && (
-                          <div className="mt-1 font-lora text-xs sm:text-sm text-[#666]">
-                            {parsedOptions.map((opt, i) => (
-                              <span key={i} className="block">
-                                {opt.group}: {opt.option}
-                              </span>
-                            ))}
-                          </div>
-                        )}
+                  return (
+                    <li
+                      key={index}
+                      className="flex flex-col border-b border-[#D4A017]/30 pb-3"
+                    >
+                      <div className="flex items-center w-full mb-3">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-16 h-16 object-cover rounded-md mr-3"
+                        />
+                        <div className="text-left flex-1">
+                          <p className="font-cormorant text-base sm:text-lg font-semibold text-[#1A1A1A]">
+                            {item.name}
+                          </p>
+                          {parsedOptions.length > 0 && (
+                            <div className="mt-1 font-lora text-xs sm:text-sm text-[#666]">
+                              {parsedOptions.map((opt, i) => (
+                                <span key={i} className="block">
+                                  {opt.group}: {opt.option} (+₦{opt.price})
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center justify-between w-full">
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => onUpdateQuantity(index, -1)}
-                          className="btn-gold-outline rounded-full w-8 h-8 flex items-center justify-center font-bold text-xs sm:text-sm"
-                        >
-                          -
-                        </button>
-                        <span className="text-base sm:text-lg font-semibold w-8 text-center text-[#1A1A1A]">
-                          {item.quantity}
-                        </span>
-                        <button
-                          onClick={() => onUpdateQuantity(index, 1)}
-                          className="btn-gold-outline rounded-full w-8 h-8 flex items-center justify-center font-bold text-xs sm:text-sm"
-                        >
-                          +
-                        </button>
+                      <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => onUpdateQuantity(index, -1)}
+                            className="btn-gold-outline rounded-full w-8 h-8 flex items-center justify-center font-bold text-xs sm:text-sm"
+                          >
+                            -
+                          </button>
+                          <span className="text-base sm:text-lg font-semibold w-8 text-center text-[#1A1A1A]">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() => onUpdateQuantity(index, 1)}
+                            className="btn-gold-outline rounded-full w-8 h-8 flex items-center justify-center font-bold text-xs sm:text-sm"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <div className="flex flex-col items-end">
+                          <p className="text-base sm:text-lg font-bold text-[#D4A017]">
+                            ₦{item.price * item.quantity}
+                          </p>
+                          <button
+                            onClick={() => onRemoveItem(index)}
+                            className="font-lora text-red-500 hover:text-red-700 text-xs sm:text-sm mt-1"
+                          >
+                            Remove
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex flex-col items-end">
-                        <p className="text-base sm:text-lg font-bold text-[#D4A017]">
-                          ₦{item.price * item.quantity}
-                        </p>
-                        <button
-                          onClick={() => onRemoveItem(index)}
-                          className="font-lora text-red-500 hover:text-red-700 text-xs sm:text-sm mt-1"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-          <div className="mt-4 text-right">
-            <span className="text-base sm:text-lg font-bold text-[#D4A017]">
-              Total: ₦{cart.reduce((total, item) => total + item.price * item.quantity, 0)}
-            </span>
-          </div>
-          <div className="mt-4 flex flex-col space-y-3">
-            <button
-              onClick={onGoBack}
-              className="btn-gold-outline font-lora text-xs sm:text-sm"
-            >
-              Back to Menu
-            </button>
-            {cart.length > 0 && (
-              <button
-                onClick={onProceedToCheckout}
-                className="btn-gold font-lora text-xs sm:text-sm"
-              >
-                Checkout
-              </button>
+                    </li>
+                  );
+                })}
+              </ul>
             )}
+            <div className="mt-4 text-right">
+              <span className="text-base sm:text-lg font-bold text-[#D4A017]">
+                Total: ₦{cart.reduce((total, item) => total + item.price * item.quantity, 0)}
+              </span>
+            </div>
+            <div className="mt-4 flex flex-col space-y-3">
+              <button
+                onClick={onGoBack}
+                className="btn-gold-outline font-lora text-xs sm:text-sm"
+              >
+                Back to Menu
+              </button>
+              {cart.length > 0 && (
+                <button
+                  onClick={onProceedToCheckout}
+                  className="btn-gold font-lora text-xs sm:text-sm"
+                >
+                  Checkout
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -970,7 +982,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         .join("\n") +
       "\n" +
       "---\n" +
-      `Total: ${orderDetails.totalPrice}`;
+      `Total: ₦${orderDetails.totalPrice}`;
 
     try {
       console.log("Simulating sending email to:", emailRecipient);
@@ -999,76 +1011,78 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
       <div className="absolute inset-0 bg-black/10" />
 
       <div className="relative z-10 container mx-auto px-4 py-6 sm:px-6">
-        <div className="max-w-sm mx-auto sm:max-w-md shiny-gold-card-bg rounded-lg p-5 sm:p-6">
-          <h2 className="text-2xl sm:text-3xl font-cormorant font-bold text-[#1A1A1A] mb-4 text-center">
-            Checkout
-          </h2>
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <div className="relative">
-              <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-[#D4A017] text-sm sm:text-base">
-                👤
-              </span>
-              <input
-                type="text"
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Full Name"
-                className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] sm:text-sm sm:pl-9 sm:py-3"
-                required
-              />
-            </div>
-            <div className="relative">
-              <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-[#D4A017] text-sm sm:text-base">
-                📞
-              </span>
-              <input
-                type="tel"
-                id="phone"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="Phone Number"
-                className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] sm:text-sm sm:pl-9 sm:py-3"
-                required
-              />
-            </div>
-            <div className="relative">
-              <span className="absolute left-2 top-3 text-[#D4A017] text-sm sm:text-base">
-                📍
-              </span>
-              <textarea
-                id="address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="Delivery Address in Lagos"
-                className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] resize-none sm:text-sm sm:pl-9 sm:py-3"
-                rows={3}
-                required
-              ></textarea>
-            </div>
-            {error && (
-              <p className="text-red-500 text-center font-lora text-xs sm:text-sm bg-red-50 p-2 rounded-md">
-                {error}
-              </p>
-            )}
-            <div className="flex flex-col space-y-3">
-              <button
-                type="button"
-                onClick={onGoBack}
-                className="btn-gold-outline font-lora text-xs sm:text-sm"
-                disabled={loading}
-              >
-                Back to Cart
-              </button>
-              <button
-                type="submit"
-                className="btn-gold font-lora text-xs sm:text-sm"
-                disabled={loading}
-              >
-                {loading ? "Processing..." : "Place Order"}
-              </button>
-            </div>
-          </form>
+        <div className="max-w-sm mx-auto sm:max-w-md">
+          <div className="shiny-gold-card-bg rounded-lg p-5 sm:p-6">
+            <h2 className="text-2xl sm:text-3xl font-cormorant font-bold text-[#1A1A1A] mb-4 text-center">
+              Checkout
+            </h2>
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <div className="relative">
+                <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-[#D4A017] text-sm sm:text-base">
+                  👤
+                </span>
+                <input
+                  type="text"
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Full Name"
+                  className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] sm:text-sm sm:pl-9 sm:py-3"
+                  required
+                />
+              </div>
+              <div className="relative">
+                <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-[#D4A017] text-sm sm:text-base">
+                  📞
+                </span>
+                <input
+                  type="tel"
+                  id="phone"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="Phone Number"
+                  className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] sm:text-sm sm:pl-9 sm:py-3"
+                  required
+                />
+              </div>
+              <div className="relative">
+                <span className="absolute left-2 top-3 text-[#D4A017] text-sm sm:text-base">
+                  📍
+                </span>
+                <textarea
+                  id="address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Delivery Address in Lagos"
+                  className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] resize-none sm:text-sm sm:pl-9 sm:py-3"
+                  rows={3}
+                  required
+                ></textarea>
+              </div>
+              {error && (
+                <p className="text-red-500 text-center font-lora text-xs sm:text-sm bg-red-50 p-2 rounded-md">
+                  {error}
+                </p>
+              )}
+              <div className="flex flex-col space-y-3">
+                <button
+                  type="button"
+                  onClick={onGoBack}
+                  className="btn-gold-outline font-lora text-xs sm:text-sm"
+                  disabled={loading}
+                >
+                  Back to Cart
+                </button>
+                <button
+                  type="submit"
+                  className="btn-gold font-lora text-xs sm:text-sm"
+                  disabled={loading}
+                >
+                  {loading ? "Processing..." : "Place Order"}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -1135,12 +1149,7 @@ const CheckoutSuccessModal: React.FC<CheckoutSuccessModalProps> = ({
                 let parsedOptions: CartOption[] = [];
                 try {
                   if (item.option && item.option.trim() !== "") {
-                    parsedOptions = item.option
-                      .split(", ")
-                      .map((opt) => {
-                        const [group, option] = opt.split(": ");
-                        return { group, option, price: 0 };
-                      });
+                    parsedOptions = JSON.parse(item.option);
                   }
                 } catch {
                   parsedOptions = item.option
@@ -1158,7 +1167,7 @@ const CheckoutSuccessModal: React.FC<CheckoutSuccessModalProps> = ({
                           key={i}
                           className="ml-3 font-lora text-xs sm:text-sm text-[#666]"
                         >
-                          {opt.group}: {opt.option}
+                          {opt.group}: {opt.option} (+₦{opt.price})
                         </p>
                       ))}
                   </div>
