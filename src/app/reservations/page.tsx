@@ -7,7 +7,7 @@ const generateOrderId = () => {
   const random = Math.floor(Math.random() * 10000)
     .toString()
     .padStart(4, "0");
-  return `IG-${random}`; // IG for IkeOluwa Grills
+  return `AZ-${random}`; // AZ for new prefix
 };
 
 // Function to calculate time remaining
@@ -261,11 +261,11 @@ const MealBookingPage = () => {
         {/* Background Image Overlay */}
         {backgroundImage && (
           <div
-            className="absolute inset-0 bg-cover bg-center opacity-30 transition-opacity duration-300"
+            className="absolute inset-0 bg-cover bg-center opacity-100 transition-opacity duration-300"
             style={{ backgroundImage: `url(${backgroundImage})` }}
           />
         )}
-        <div className="absolute inset-0 bg-white/70" />
+        <div className="absolute inset-0 bg-black/10" />
 
         {/* Main Content */}
         <div className="relative z-10 container mx-auto px-4 py-6 sm:px-6">
@@ -529,7 +529,7 @@ const MealBookingPage = () => {
                     Track Your Order
                   </h2>
                   <p className="font-lora text-[#666] text-xs sm:text-sm">
-                    Enter your order ID to view booking details
+                    Enter your order ID (e.g., AZ-1234) to view details
                   </p>
                 </div>
 
@@ -543,7 +543,7 @@ const MealBookingPage = () => {
                       value={trackingId}
                       onChange={(e) => setTrackingId(e.target.value)}
                       required
-                      placeholder="Order ID (e.g., IG-1234)"
+                      placeholder="Order ID (e.g., AZ-1234)"
                       className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] uppercase sm:text-sm sm:pl-9 sm:py-3"
                     />
                   </div>
