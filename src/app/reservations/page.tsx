@@ -403,7 +403,7 @@ const MealBookingPage = () => {
                       value={formFields.mealQuantity}
                       onChange={handleFormChange}
                       min="1"
-                      max="20"
+                      max="1000"
                       required
                       placeholder="Number of Meals"
                       className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] sm:text-sm sm:pl-9 sm:py-3"
