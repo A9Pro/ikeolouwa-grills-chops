@@ -851,30 +851,47 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
+    console.log("handleSubmit called with cart:", cart);
 
+    // Validate inputs
     if (!name || !phone || !address) {
+      console.log("Validation failed: All fields are mandatory.");
       setError("All fields are mandatory.");
       setLoading(false);
       return;
     }
 
     if (!validatePhone(phone)) {
+      console.log("Validation failed: Invalid phone number:", phone);
       setError("Please enter a valid 11-digit phone number.");
       setLoading(false);
       return;
     }
 
-    setLoading(true);
+    // Validate cart
+    if (!cart || !Array.isArray(cart) || cart.length === 0) {
+      console.log("Validation failed: Cart is empty or invalid:", cart);
+      setError("Cart is empty or invalid. Please add items to your cart.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const orderNumber = generateOrderNumber();
+      console.log("Generated order number:", orderNumber);
 
       const orderDetails: OrderInfo = {
         customerName: name,
         customerPhone: phone,
         customerAddress: address,
         orderItems: cart,
-        totalPrice: cart.reduce((total, item) => total + item.price * item.quantity, 0),
+        totalPrice: cart.reduce((total, item) => {
+          if (!item.price || !item.quantity) {
+            throw new Error(`Invalid cart item: ${JSON.stringify(item)}`);
+          }
+          return total + item.price * item.quantity;
+        }, 0),
         orderNumber: orderNumber,
       };
 
@@ -900,25 +917,22 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         "---\n" +
         `Total: ₦${orderDetails.totalPrice}`;
 
-      console.log("Sending order details...");
+      console.log("Preparing to send order details...");
       console.log("Email recipient:", emailRecipient);
       console.log("Phone recipient:", phoneRecipient);
       console.log("Order message:", orderMessage);
 
       // Simulate async processing
-      await new Promise((resolve, reject) => {
+      await new Promise((resolve) => {
         setTimeout(() => {
-          try {
-            resolve("Order processed successfully");
-          } catch (err) {
-            reject(new Error("Simulated processing error"));
-          }
+          console.log("Simulated order processing completed");
+          resolve("Order processed successfully");
         }, 2000);
       });
 
       console.log("Calling onConfirmOrder with orderDetails:", orderDetails);
       onConfirmOrder(orderDetails);
-      console.log("Order confirmation triggered successfully");
+      console.log("onConfirmOrder called successfully");
     } catch (err) {
       console.error("Error in order processing:", err);
       setError("Failed to place order. Please try again.");
@@ -1139,6 +1153,11 @@ export default function App() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [orderInfo, setOrderInfo] = useState<OrderInfo | null>(null);
 
+  useEffect(() => {
+    console.log("showSuccessModal changed:", showSuccessModal);
+    console.log("Current state: currentPage=", currentPage, "orderInfo=", orderInfo);
+  }, [showSuccessModal, currentPage, orderInfo]);
+
   const handleUpdateQuantity = (index: number, delta: number) => {
     setCart((prevCart) => {
       const newCart = [...prevCart];
@@ -1161,6 +1180,7 @@ export default function App() {
   };
 
   const handleProceedToCheckout = () => {
+    console.log("handleProceedToCheckout called, cart:", cart);
     setCurrentPage("checkout");
   };
 
@@ -1169,7 +1189,7 @@ export default function App() {
     setOrderInfo(info);
     setCart([]);
     setShowSuccessModal(true);
-    setCurrentPage("menu"); // Ensure currentPage is reset
+    setCurrentPage("menu");
     console.log("State updated: showSuccessModal=true, cart cleared, currentPage=menu");
   };
 
