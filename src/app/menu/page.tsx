@@ -1189,8 +1189,7 @@ export default function App() {
     setOrderInfo(info);
     setCart([]);
     setShowSuccessModal(true);
-    setCurrentPage("menu");
-    console.log("State updated: showSuccessModal=true, cart cleared, currentPage=menu");
+    // Don't set currentPage here, let showSuccessModal control the view
   };
 
   const handleGoBackFromModal = () => {
@@ -1215,34 +1214,40 @@ export default function App() {
           .social-link:hover { color: #D4A017; }
         `}
       </style>
-      {currentPage === "menu" && (
-        <MenuPage
-          cart={cart}
-          setCart={setCart}
-          onShowCart={() => setCurrentPage("cart")}
-        />
-      )}
-      {currentPage === "cart" && (
-        <CartPage
-          cart={cart}
-          onGoBack={() => setCurrentPage("menu")}
-          onUpdateQuantity={handleUpdateQuantity}
-          onRemoveItem={handleRemoveItem}
-          onProceedToCheckout={handleProceedToCheckout}
-        />
-      )}
-      {currentPage === "checkout" && (
-        <CheckoutForm
-          cart={cart}
-          onConfirmOrder={handleConfirmOrder}
-          onGoBack={() => setCurrentPage("cart")}
-        />
-      )}
-      {showSuccessModal && (
+      
+      {/* Show success modal first if it's active */}
+      {showSuccessModal ? (
         <CheckoutSuccessModal
           orderInfo={orderInfo}
           onGoBack={handleGoBackFromModal}
         />
+      ) : (
+        <>
+          {/* Only show other pages when success modal is not active */}
+          {currentPage === "menu" && (
+            <MenuPage
+              cart={cart}
+              setCart={setCart}
+              onShowCart={() => setCurrentPage("cart")}
+            />
+          )}
+          {currentPage === "cart" && (
+            <CartPage
+              cart={cart}
+              onGoBack={() => setCurrentPage("menu")}
+              onUpdateQuantity={handleUpdateQuantity}
+              onRemoveItem={handleRemoveItem}
+              onProceedToCheckout={handleProceedToCheckout}
+            />
+          )}
+          {currentPage === "checkout" && (
+            <CheckoutForm
+              cart={cart}
+              onConfirmOrder={handleConfirmOrder}
+              onGoBack={() => setCurrentPage("cart")}
+            />
+          )}
+        </>
       )}
     </>
   );
