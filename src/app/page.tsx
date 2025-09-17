@@ -62,16 +62,16 @@ export default function Home() {
       {/* Additional Content */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
         <h2 className="text-3xl font-playfair font-bold text-[#1a1a1a] mb-4">
-          Our Story
+          Our IkeOluwa
         </h2>
         <p className="text-lg font-cormorant text-[#4a4a4a] mb-6">
           At IkeOluwa Grills & Chops, we blend tradition with innovation to bring you the best of Nigerian flavors.
         </p>
         <Link
-          href="/about"
+          href="/reservations"
           className="inline-block bg-[#1a1a1a] text-white font-cormorant text-lg py-3 px-6 rounded hover:bg-[#2a2a2a] transition-colors"
         >
-          Learn More
+          Book Your Meal
         </Link>
       </section>
     </div>

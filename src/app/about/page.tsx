@@ -33,15 +33,32 @@ export default function AboutContactPage() {
     setMessageBoxVisible(false);
   };
 
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const form = e.target as HTMLFormElement;
-    const formData = new FormData(form);
-    const contactData = Object.fromEntries(formData.entries());
-    console.log("Contact form data:", contactData);
-    showMessage("Thank you for your message! We'll get back to you shortly.");
-    form.reset();
-  };
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  const form = e.target as HTMLFormElement;
+  const formData = new FormData(form);
+  const contactData = Object.fromEntries(formData.entries());
+
+  try {
+    const response = await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(contactData),
+    });
+
+    const data = await response.json(); // ✅ always parse JSON
+
+    if (response.ok) {
+      showMessage(data.message || "✅ Thank you for your message! We'll get back to you shortly.");
+      form.reset();
+    } else {
+      showMessage(data.error || "❌ Something went wrong. Please try again later.");
+    }
+  } catch (error) {
+    console.error("Submission error:", error);
+    showMessage("⚠️ Error sending your message. Please try again later.");
+  }
+};
 
   // Custom styles
   const customStyles = `

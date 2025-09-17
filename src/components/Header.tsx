@@ -39,10 +39,10 @@ export default function Header() {
             Menu
           </Link>
           <Link href="/reservations" className="nav-link font-cormorant text-lg">
-            Reservations
+            Book Your Meal
           </Link>
           <Link href="/about" className="nav-link font-cormorant text-lg">
-            About & Contact
+            About | Contact
           </Link>
         </nav>
       </div>
@@ -71,7 +71,7 @@ export default function Header() {
             className="nav-link font-cormorant text-lg py-2"
             onClick={toggleMenu}
           >
-            Reservations
+            Book Your Meal
           </Link>
           <Link
             href="/about"

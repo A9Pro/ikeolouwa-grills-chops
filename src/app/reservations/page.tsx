@@ -2,16 +2,183 @@
 
 import { useState, useEffect } from "react";
 
+// Vendor contact information
+const VENDOR_CONFIG = {
+  phone: "+2348132791933", // Vendor's phone number
+  email: "herpick3@gmail.com", // Vendor's email
+  whatsapp: "+2348132791933", // Vendor's WhatsApp number
+  businessName: "IkeOluwa Grills & Chops"
+};
+
 // Function to generate order ID
 const generateOrderId = () => {
   const random = Math.floor(Math.random() * 10000)
     .toString()
     .padStart(4, "0");
-  return `AZ-${random}`; // AZ for new prefix
+  return `AZ-${random}`;
+};
+
+// Function to send vendor notifications
+const sendVendorNotifications = async (orderData) => {
+  const notifications = {
+    email: false,
+    sms: false,
+    whatsapp: false
+  };
+
+  // Format order details for notification
+  const orderDetails = `
+🍽️ NEW MEAL BOOKING - ${VENDOR_CONFIG.businessName}
+
+📋 Order Details:
+• Order ID: ${orderData.id}
+• Customer: ${orderData.name}
+• Phone: ${orderData.phone}
+• Email: ${orderData.email || 'Not provided'}
+• Delivery Address: ${orderData.deliveryAddress}
+• Delivery Date: ${new Date(orderData.date).toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  })}
+• Delivery Time: ${orderData.time}
+• Number of Meals: ${orderData.mealQuantity}
+• Special Instructions: ${orderData.specialInstructions || 'None'}
+• Order Time: ${new Date(orderData.createdAt).toLocaleString()}
+
+💰 Next Steps:
+1. Call customer to confirm menu selection
+2. Confirm payment method (Cash on delivery/Bank transfer)
+3. Prepare order for scheduled delivery
+
+Customer Contact: ${orderData.phone}
+  `.trim();
+
+  try {
+    // 1. Send Email Notification
+    try {
+      const emailResponse = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: VENDOR_CONFIG.email,
+          subject: `🍽️ New Order ${orderData.id} - ${orderData.name}`,
+          text: orderDetails,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <div style="background: #D4A017; color: white; padding: 20px; text-align: center;">
+                <h1>🍽️ New Meal Booking</h1>
+                <h2>${VENDOR_CONFIG.businessName}</h2>
+              </div>
+              
+              <div style="background: #f8f9fa; padding: 20px;">
+                <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                  <h3 style="color: #D4A017; margin-top: 0;">Order #${orderData.id}</h3>
+                  
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Customer:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${orderData.name}</td></tr>
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Phone:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${orderData.phone}</td></tr>
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Email:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${orderData.email || 'Not provided'}</td></tr>
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Delivery Address:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${orderData.deliveryAddress}</td></tr>
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Delivery Date:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${new Date(orderData.date).toLocaleDateString('en-US', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}</td></tr>
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Delivery Time:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${orderData.time}</td></tr>
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Number of Meals:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${orderData.mealQuantity}</td></tr>
+                    <tr><td style="padding: 8px 0;"><strong>Special Instructions:</strong></td><td style="padding: 8px 0;">${orderData.specialInstructions || 'None'}</td></tr>
+                  </table>
+                  
+                  <div style="margin-top: 20px; padding: 15px; background: #f0f8f0; border-radius: 5px;">
+                    <h4 style="color: #2d5a2d; margin: 0 0 10px 0;">💰 Next Steps:</h4>
+                    <ol style="margin: 0; padding-left: 20px;">
+                      <li>Call customer to confirm menu selection</li>
+                      <li>Confirm payment method (Cash on delivery/Bank transfer)</li>
+                      <li>Prepare order for scheduled delivery</li>
+                    </ol>
+                  </div>
+                  
+                  <div style="text-align: center; margin-top: 20px;">
+                    <a href="tel:${orderData.phone}" style="background: #D4A017; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">📞 Call Customer</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `
+        })
+      });
+      
+      if (emailResponse.ok) {
+        notifications.email = true;
+      }
+    } catch (emailError) {
+      console.error('Email notification failed:', emailError);
+    }
+
+    // 2. Send SMS Notification
+    try {
+      const smsResponse = await fetch('/api/send-sms', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: VENDOR_CONFIG.phone,
+          message: `🍽️ NEW ORDER ${orderData.id}\n\nCustomer: ${orderData.name}\nPhone: ${orderData.phone}\nDelivery: ${new Date(orderData.date).toLocaleDateString()} at ${orderData.time}\nMeals: ${orderData.mealQuantity}\n\nCall customer to confirm menu and payment.`
+        })
+      });
+      
+      if (smsResponse.ok) {
+        notifications.sms = true;
+      }
+    } catch (smsError) {
+      console.error('SMS notification failed:', smsError);
+    }
+
+    // 3. Send WhatsApp Notification
+    try {
+      // Method 1: WhatsApp Business API (if you have it set up)
+      const whatsappResponse = await fetch('/api/send-whatsapp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: VENDOR_CONFIG.whatsapp,
+          message: orderDetails
+        })
+      });
+      
+      if (whatsappResponse.ok) {
+        notifications.whatsapp = true;
+      }
+    } catch (whatsappError) {
+      console.error('WhatsApp API notification failed:', whatsappError);
+      
+      // Method 2: Fallback - Open WhatsApp Web/App with pre-filled message
+      const whatsappMessage = encodeURIComponent(orderDetails);
+      const whatsappUrl = `https://wa.me/${VENDOR_CONFIG.whatsapp.replace('+', '')}?text=${whatsappMessage}`;
+      
+      // In a real app, you might want to open this in a new window
+      // window.open(whatsappUrl, '_blank');
+      console.log('WhatsApp fallback URL:', whatsappUrl);
+      notifications.whatsapp = 'fallback';
+    }
+
+  } catch (error) {
+    console.error('Vendor notification error:', error);
+  }
+
+  return notifications;
 };
 
 // Function to calculate time remaining
-const calculateTimeRemaining = (targetDate: string | Date) => {
+const calculateTimeRemaining = (targetDate) => {
   const now = new Date().getTime();
   const target = new Date(targetDate).getTime();
   const difference = target - now;
@@ -30,7 +197,7 @@ const calculateTimeRemaining = (targetDate: string | Date) => {
 };
 
 // Countdown Timer Component
-const CountdownTimer = ({ targetDate }: { targetDate: string | Date }) => {
+const CountdownTimer = ({ targetDate }) => {
   const [timeRemaining, setTimeRemaining] = useState(
     calculateTimeRemaining(targetDate)
   );
@@ -63,7 +230,7 @@ const CountdownTimer = ({ targetDate }: { targetDate: string | Date }) => {
             className="bg-[#D4A017]/10 rounded-md p-2 border border-[#D4A017]/30"
           >
             <div className="text-base font-bold text-[#D4A017] sm:text-lg">
-              {timeRemaining[unit as keyof typeof timeRemaining]}
+              {timeRemaining[unit]}
             </div>
             <div className="text-xs text-[#666] font-lora">
               {unit.charAt(0).toUpperCase() + unit.slice(1)}
@@ -75,28 +242,46 @@ const CountdownTimer = ({ targetDate }: { targetDate: string | Date }) => {
   );
 };
 
-// Meal Order type
-interface MealOrder {
-  id: string | null;
-  name: string;
-  email: string;
-  phone: string;
-  deliveryAddress: string;
-  date: string;
-  time: string;
-  dateTime: string;
-  mealQuantity: number;
-  specialInstructions: string;
-  createdAt: string;
-  status: string;
-}
+// Notification Status Component
+const NotificationStatus = ({ notifications }) => {
+  if (!notifications) return null;
+
+  return (
+    <div className="mt-3 p-3 bg-gray-50 rounded-md">
+      <p className="text-sm font-medium text-gray-800 mb-2">📡 Vendor Notifications:</p>
+      <div className="space-y-1 text-xs">
+        <div className="flex justify-between">
+          <span>Email:</span>
+          <span className={notifications.email ? 'text-green-600' : 'text-red-600'}>
+            {notifications.email ? '✅ Sent' : '❌ Failed'}
+          </span>
+        </div>
+        <div className="flex justify-between">
+          <span>SMS:</span>
+          <span className={notifications.sms ? 'text-green-600' : 'text-red-600'}>
+            {notifications.sms ? '✅ Sent' : '❌ Failed'}
+          </span>
+        </div>
+        <div className="flex justify-between">
+          <span>WhatsApp:</span>
+          <span className={notifications.whatsapp ? 'text-green-600' : 'text-red-600'}>
+            {notifications.whatsapp === 'fallback' ? '⚠️ Manual' : 
+             notifications.whatsapp ? '✅ Sent' : '❌ Failed'}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const MealBookingPage = () => {
-  const [view, setView] = useState<"form" | "success" | "tracking">("form");
-  const [orders, setOrders] = useState<MealOrder[]>([]);
-  const [currentOrder, setCurrentOrder] = useState<MealOrder | null>(null);
+  const [view, setView] = useState("form");
+  const [orders, setOrders] = useState([]);
+  const [currentOrder, setCurrentOrder] = useState(null);
   const [trackingId, setTrackingId] = useState("");
   const [trackingError, setTrackingError] = useState("");
+  const [notifications, setNotifications] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formFields, setFormFields] = useState({
     name: "",
@@ -107,7 +292,7 @@ const MealBookingPage = () => {
     time: "",
     mealQuantity: 1,
     specialInstructions: "",
-    id: null as string | null,
+    id: null,
   });
 
   // Backgrounds
@@ -128,9 +313,7 @@ const MealBookingPage = () => {
     return () => clearInterval(backgroundTimer);
   }, []);
 
-  const handleFormChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
+  const handleFormChange = (e) => {
     const { name, value } = e.target;
     setFormFields((prev) => ({
       ...prev,
@@ -138,57 +321,71 @@ const MealBookingPage = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const form = e.target as HTMLFormElement;
+    setIsSubmitting(true);
+    
+    const form = e.target;
 
-    if (formFields.id) {
-      // Edit order
-      const updatedOrders = orders.map((order) =>
-        order.id === formFields.id
-          ? {
-              ...order,
-              ...formFields,
-              dateTime: `${formFields.date}T${formFields.time}`,
-            }
-          : order
-      );
-      setOrders(updatedOrders);
-      setCurrentOrder(
-        updatedOrders.find((order) => order.id === formFields.id) || null
-      );
-      setView("success");
-    } else {
-      // New order
-      const orderId = generateOrderId();
-      const deliveryDateTime = `${formFields.date}T${formFields.time}`;
+    try {
+      if (formFields.id) {
+        // Edit order
+        const updatedOrders = orders.map((order) =>
+          order.id === formFields.id
+            ? {
+                ...order,
+                ...formFields,
+                dateTime: `${formFields.date}T${formFields.time}`,
+              }
+            : order
+        );
+        setOrders(updatedOrders);
+        setCurrentOrder(
+          updatedOrders.find((order) => order.id === formFields.id) || null
+        );
+        setView("success");
+      } else {
+        // New order
+        const orderId = generateOrderId();
+        const deliveryDateTime = `${formFields.date}T${formFields.time}`;
 
-      const newOrder: MealOrder = {
-        id: orderId,
-        name: formFields.name,
-        email: formFields.email,
-        phone: formFields.phone,
-        deliveryAddress: formFields.deliveryAddress,
-        date: formFields.date,
-        time: formFields.time,
-        dateTime: deliveryDateTime,
-        mealQuantity: formFields.mealQuantity,
-        specialInstructions: formFields.specialInstructions,
-        createdAt: new Date().toISOString(),
-        status: "confirmed",
-      };
+        const newOrder = {
+          id: orderId,
+          name: formFields.name,
+          email: formFields.email,
+          phone: formFields.phone,
+          deliveryAddress: formFields.deliveryAddress,
+          date: formFields.date,
+          time: formFields.time,
+          dateTime: deliveryDateTime,
+          mealQuantity: formFields.mealQuantity,
+          specialInstructions: formFields.specialInstructions,
+          createdAt: new Date().toISOString(),
+          status: "confirmed",
+        };
 
-      setOrders((prev) => [...prev, newOrder]);
-      setCurrentOrder(newOrder);
-      setView("success");
+        // Send vendor notifications
+        const notificationResults = await sendVendorNotifications(newOrder);
+        setNotifications(notificationResults);
+
+        setOrders((prev) => [...prev, newOrder]);
+        setCurrentOrder(newOrder);
+        setView("success");
+      }
+
+      form.reset();
+    } catch (error) {
+      console.error('Order submission error:', error);
+      alert('There was an error processing your order. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    form.reset();
   };
 
   const handleMakeAnother = () => {
     setView("form");
     setCurrentOrder(null);
+    setNotifications(null);
     setFormFields({
       name: "",
       email: "",
@@ -219,9 +416,9 @@ const MealBookingPage = () => {
     }
   };
 
-  const handleTrackSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleTrackSubmit = (e) => {
     e.preventDefault();
-    const form = e.target as HTMLFormElement;
+    const form = e.target;
     const foundOrder = orders.find(
       (order) => order.id === trackingId.toUpperCase()
     );
@@ -249,6 +446,7 @@ const MealBookingPage = () => {
     .nav-link:hover::after { transform: scaleX(1); }
     .btn-gold { padding: 0.75rem 1.5rem; background: #D4A017; color: #1A1A1A; font-weight: 500; border-radius: 9999px; transition: all 200ms; min-height: 44px; }
     .btn-gold:hover { background: #B88C14; transform: scale(1.02); }
+    .btn-gold:disabled { background: #ccc; cursor: not-allowed; transform: none; }
     .btn-gold-outline { padding: 0.75rem 1.5rem; border: 1px solid #D4A017; color: #D4A017; border-radius: 9999px; transition: all 200ms; min-height: 44px; }
     .btn-gold-outline:hover { background: #D4A017; color: #1A1A1A; transform: scale(1.02); }
     .shiny-gold-card-bg { background: #F8F4E3; border: 1px solid #D4A017/50; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
@@ -298,8 +496,9 @@ const MealBookingPage = () => {
                       value={formFields.name}
                       onChange={handleFormChange}
                       required
+                      disabled={isSubmitting}
                       placeholder="Full Name"
-                      className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] sm:text-sm sm:pl-9 sm:py-3"
+                      className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] disabled:opacity-50 sm:text-sm sm:pl-9 sm:py-3"
                     />
                   </div>
 
@@ -313,8 +512,9 @@ const MealBookingPage = () => {
                       name="email"
                       value={formFields.email}
                       onChange={handleFormChange}
+                      disabled={isSubmitting}
                       placeholder="Email Address (optional)"
-                      className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] sm:text-sm sm:pl-9 sm:py-3"
+                      className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] disabled:opacity-50 sm:text-sm sm:pl-9 sm:py-3"
                     />
                   </div>
 
@@ -329,8 +529,9 @@ const MealBookingPage = () => {
                       value={formFields.phone}
                       onChange={handleFormChange}
                       required
+                      disabled={isSubmitting}
                       placeholder="Phone Number"
-                      className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] sm:text-sm sm:pl-9 sm:py-3"
+                      className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] disabled:opacity-50 sm:text-sm sm:pl-9 sm:py-3"
                     />
                   </div>
 
@@ -344,9 +545,10 @@ const MealBookingPage = () => {
                       value={formFields.deliveryAddress}
                       onChange={handleFormChange}
                       required
+                      disabled={isSubmitting}
                       placeholder="Delivery Address"
                       rows={3}
-                      className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] resize-none sm:text-sm sm:pl-9 sm:py-3"
+                      className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] resize-none disabled:opacity-50 sm:text-sm sm:pl-9 sm:py-3"
                     />
                   </div>
 
@@ -362,8 +564,9 @@ const MealBookingPage = () => {
                         value={formFields.date}
                         onChange={handleFormChange}
                         required
+                        disabled={isSubmitting}
                         min={new Date().toISOString().split("T")[0]}
-                        className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] sm:text-sm sm:pl-9 sm:py-3"
+                        className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] disabled:opacity-50 sm:text-sm sm:pl-9 sm:py-3"
                       />
                     </div>
                     <div className="relative">
@@ -375,7 +578,8 @@ const MealBookingPage = () => {
                         value={formFields.time}
                         onChange={handleFormChange}
                         required
-                        className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] appearance-none sm:text-sm sm:pl-9 sm:py-3"
+                        disabled={isSubmitting}
+                        className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] appearance-none disabled:opacity-50 sm:text-sm sm:pl-9 sm:py-3"
                       >
                         <option value="">Select Time</option>
                         {Array.from({ length: 48 }, (_, i) => {
@@ -405,8 +609,9 @@ const MealBookingPage = () => {
                       min="1"
                       max="1000"
                       required
+                      disabled={isSubmitting}
                       placeholder="Number of Meals"
-                      className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] sm:text-sm sm:pl-9 sm:py-3"
+                      className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] disabled:opacity-50 sm:text-sm sm:pl-9 sm:py-3"
                     />
                   </div>
 
@@ -419,18 +624,30 @@ const MealBookingPage = () => {
                       name="specialInstructions"
                       value={formFields.specialInstructions}
                       onChange={handleFormChange}
+                      disabled={isSubmitting}
                       placeholder="Special Instructions (e.g., dietary preferences)"
                       rows={3}
-                      className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] resize-none sm:text-sm sm:pl-9 sm:py-3"
+                      className="w-full pl-8 pr-3 py-2.5 border border-[#D4A017]/50 rounded-lg bg-white/95 font-lora text-xs placeholder-[#999] focus:outline-none focus:ring-1 focus:ring-[#D4A017] focus:border-[#D4A017] resize-none disabled:opacity-50 sm:text-sm sm:pl-9 sm:py-3"
                     />
                   </div>
 
                   {/* Submit Button */}
                   <button
                     type="submit"
+                    disabled={isSubmitting}
                     className="w-full btn-gold font-lora text-xs sm:text-sm"
                   >
-                    {formFields.id ? "Update Order" : "Confirm Booking"}
+                    {isSubmitting ? (
+                      <span className="flex items-center justify-center">
+                        <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Processing...
+                      </span>
+                    ) : (
+                      formFields.id ? "Update Order" : "Confirm Booking"
+                    )}
                   </button>
                 </form>
               </div>
@@ -493,6 +710,9 @@ const MealBookingPage = () => {
                 </div>
 
                 <CountdownTimer targetDate={currentOrder.dateTime} />
+
+                {/* Notification Status */}
+                <NotificationStatus notifications={notifications} />
 
                 <div className="flex gap-2 mt-4 sm:gap-3">
                   <button
