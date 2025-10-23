@@ -33,21 +33,21 @@ const sendVendorNotifications = async (orderData: any) => {
 🍽️ NEW MEAL BOOKING - ${VENDOR_CONFIG.businessName}
 
 📋 Order Details:
-• Order ID: ${orderData.id}
-• Customer: ${orderData.name}
-• Phone: ${orderData.phone}
-• Email: ${orderData.email || "Not provided"}
-• Delivery Address: ${orderData.deliveryAddress}
-• Delivery Date: ${new Date(orderData.date).toLocaleDateString("en-US", {
+- Order ID: ${orderData.id}
+- Customer: ${orderData.name}
+- Phone: ${orderData.phone}
+- Email: ${orderData.email || "Not provided"}
+- Delivery Address: ${orderData.deliveryAddress}
+- Delivery Date: ${new Date(orderData.date).toLocaleDateString("en-US", {
     weekday: "long",
     year: "numeric",
     month: "long",
     day: "numeric",
   })}
-• Delivery Time: ${orderData.time}
-• Number of Meals: ${orderData.mealQuantity}
-• Special Instructions: ${orderData.specialInstructions || "None"}
-• Order Time: ${new Date(orderData.createdAt).toLocaleString()}
+- Delivery Time: ${orderData.time}
+- Number of Meals: ${orderData.mealQuantity}
+- Special Instructions: ${orderData.specialInstructions || "None"}
+- Order Time: ${new Date(orderData.createdAt).toLocaleString()}
   `.trim();
 
   try {
@@ -87,11 +87,11 @@ const sendVendorNotifications = async (orderData: any) => {
                 <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Email:</strong></td><td>${orderData.email || "Not provided"}</td></tr>
                 <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Delivery Address:</strong></td><td>${orderData.deliveryAddress}</td></tr>
                 <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Delivery Date:</strong></td><td>${new Date(orderData.date).toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })}</td></tr>
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })}</td></tr>
                 <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Delivery Time:</strong></td><td>${orderData.time}</td></tr>
                 <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Number of Meals:</strong></td><td>${orderData.mealQuantity}</td></tr>
                 <tr><td style="padding: 8px 0;"><strong>Special Instructions:</strong></td><td>${orderData.specialInstructions || "None"}</td></tr>
@@ -130,6 +130,29 @@ const sendVendorNotifications = async (orderData: any) => {
   return notifications;
 };
 
+// Order type definition
+type Order = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  deliveryAddress: string;
+  date: string;
+  time: string;
+  dateTime: string;
+  mealQuantity: number;
+  specialInstructions: string;
+  createdAt: string;
+  status: string;
+};
+
+// Notifications type definition
+type Notifications = {
+  email: boolean;
+  sms: string;
+  whatsapp: string;
+};
+
 // Function to calculate time remaining
 const calculateTimeRemaining = (targetDate: string | Date) => {
   const now = new Date().getTime();
@@ -150,7 +173,7 @@ const calculateTimeRemaining = (targetDate: string | Date) => {
 };
 
 // Countdown Timer Component
-const CountdownTimer = ({ targetDate }) => {
+const CountdownTimer = ({ targetDate }: { targetDate: string | Date }) => {
   const [timeRemaining, setTimeRemaining] = useState(calculateTimeRemaining(targetDate));
 
   useEffect(() => {
@@ -175,9 +198,9 @@ const CountdownTimer = ({ targetDate }) => {
         Time until your meal delivery:
       </p>
       <div className="grid grid-cols-4 gap-2 text-center">
-        {["days", "hours", "minutes", "seconds"].map((unit, i) => (
+        {(["days", "hours", "minutes", "seconds"] as Array<keyof typeof timeRemaining>).map((unit) => (
           <div
-            key={i}
+            key={unit}
             className="bg-[#D4A017]/10 rounded-md p-2 border border-[#D4A017]/30"
           >
             <div className="text-base font-bold text-[#D4A017] sm:text-lg">
@@ -194,7 +217,7 @@ const CountdownTimer = ({ targetDate }) => {
 };
 
 // Notification Status Component
-const NotificationStatus = ({ notifications }) => {
+const NotificationStatus = ({ notifications }: { notifications: any }) => {
   if (!notifications) return null;
 
   return (
@@ -226,24 +249,24 @@ const NotificationStatus = ({ notifications }) => {
 
 const MealBookingPage = () => {
   const [view, setView] = useState("form");
-  const [orders, setOrders] = useState([]);
-  const [currentOrder, setCurrentOrder] = useState(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
   const [trackingId, setTrackingId] = useState("");
   const [trackingError, setTrackingError] = useState("");
-  const [notifications, setNotifications] = useState(null);
+  const [notifications, setNotifications] = useState<Notifications | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [formFields, setFormFields] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    deliveryAddress: "",
-    date: "",
-    time: "",
-    mealQuantity: 1,
-    specialInstructions: "",
-    id: null,
-  });
+const [formFields, setFormFields] = useState({
+  name: "",
+  email: "",
+  phone: "",
+  deliveryAddress: "",
+  date: "",
+  time: "",
+  mealQuantity: 1,
+  specialInstructions: "",
+  id: null as string | null,
+});
 
   // Backgrounds
   const [backgroundImage, setBackgroundImage] = useState("/images/bg1.png");
@@ -263,72 +286,70 @@ const MealBookingPage = () => {
     return () => clearInterval(backgroundTimer);
   }, []);
 
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setFormFields((prev) => ({
-      ...prev,
-      [name]: name === "mealQuantity" ? parseInt(value) || 1 : value,
-    }));
-  };
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const { name, value } = e.target;
+  setFormFields((prev) => ({
+    ...prev,
+    [name]: name === "mealQuantity" ? parseInt(value) || 1 : value,
+  }));
+};
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsSubmitting(true);
 
-    const form = e.target;
+  try {
+    if (formFields.id) {
+      // Edit order - formFields.id is guaranteed to be string here
+      const updatedOrders = orders.map((order) =>
+        order.id === formFields.id
+          ? {
+              ...order,
+              ...formFields,
+              id: formFields.id, // Explicitly set id as string
+              dateTime: `${formFields.date}T${formFields.time}`,
+            }
+          : order
+      ) as Order[]; // Type assertion after ensuring id is string
+      
+      setOrders(updatedOrders);
+      setCurrentOrder(updatedOrders.find((order) => order.id === formFields.id) || null);
+      setView("success");
+    } else {
+      // New order
+      const orderId = generateOrderId();
+      const deliveryDateTime = `${formFields.date}T${formFields.time}`;
 
-    try {
-      if (formFields.id) {
-        // Edit order
-        const updatedOrders = orders.map((order) =>
-          order.id === formFields.id
-            ? {
-                ...order,
-                ...formFields,
-                dateTime: `${formFields.date}T${formFields.time}`,
-              }
-            : order
-        );
-        setOrders(updatedOrders);
-        setCurrentOrder(updatedOrders.find((order) => order.id === formFields.id) || null);
-        setView("success");
-      } else {
-        // New order
-        const orderId = generateOrderId();
-        const deliveryDateTime = `${formFields.date}T${formFields.time}`;
+      const newOrder: Order = {
+        id: orderId,
+        name: formFields.name,
+        email: formFields.email,
+        phone: formFields.phone,
+        deliveryAddress: formFields.deliveryAddress,
+        date: formFields.date,
+        time: formFields.time,
+        dateTime: deliveryDateTime,
+        mealQuantity: formFields.mealQuantity,
+        specialInstructions: formFields.specialInstructions,
+        createdAt: new Date().toISOString(),
+        status: "confirmed",
+      };
 
-        const newOrder = {
-          id: orderId,
-          name: formFields.name,
-          email: formFields.email,
-          phone: formFields.phone,
-          deliveryAddress: formFields.deliveryAddress,
-          date: formFields.date,
-          time: formFields.time,
-          dateTime: deliveryDateTime,
-          mealQuantity: formFields.mealQuantity,
-          specialInstructions: formFields.specialInstructions,
-          createdAt: new Date().toISOString(),
-          status: "confirmed",
-        };
+      // Send vendor notifications
+      const notificationResults = await sendVendorNotifications(newOrder);
+      setNotifications(notificationResults);
 
-        // Send vendor notifications
-        const notificationResults = await sendVendorNotifications(newOrder);
-        setNotifications(notificationResults);
-
-        setOrders((prev) => [...prev, newOrder]);
-        setCurrentOrder(newOrder);
-        setView("success");
-      }
-
-      form.reset();
-    } catch (error) {
-      console.error("Order submission error:", error);
-      alert("There was an error processing your order. Please try again.");
-    } finally {
-      setIsSubmitting(false);
+      setOrders((prev) => [...prev, newOrder]);
+      setCurrentOrder(newOrder);
+      setView("success");
     }
-  };
+  } catch (error) {
+    console.error("Order submission error:", error);
+    alert("There was an error processing your order. Please try again.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const handleMakeAnother = () => {
     setView("form");
@@ -364,9 +385,9 @@ const MealBookingPage = () => {
     }
   };
 
-  const handleTrackSubmit = (e) => {
-    e.preventDefault();
-    const form = e.target;
+  const handleTrackSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  const form = e.currentTarget;
     const foundOrder = orders.find((order) => order.id === trackingId.toUpperCase());
 
     if (foundOrder) {
