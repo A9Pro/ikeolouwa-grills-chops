@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 // Vendor contact information
 const VENDOR_CONFIG = {
   phone: "+2348132791933", // Vendor's phone number
   email: "herpick3@gmail.com", // Vendor's email
   whatsapp: "+2348132791933", // Vendor's WhatsApp number
-  businessName: "IkeOluwa Grills & Chops"
+  businessName: "IkeOluwa Grills & Chops",
 };
 
 // Function to generate order ID
@@ -23,7 +24,7 @@ const sendVendorNotifications = async (orderData) => {
   const notifications = {
     email: false,
     sms: false,
-    whatsapp: false
+    whatsapp: false,
   };
 
   // Format order details for notification
@@ -34,17 +35,17 @@ const sendVendorNotifications = async (orderData) => {
 • Order ID: ${orderData.id}
 • Customer: ${orderData.name}
 • Phone: ${orderData.phone}
-• Email: ${orderData.email || 'Not provided'}
+• Email: ${orderData.email || "Not provided"}
 • Delivery Address: ${orderData.deliveryAddress}
-• Delivery Date: ${new Date(orderData.date).toLocaleDateString('en-US', { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+• Delivery Date: ${new Date(orderData.date).toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   })}
 • Delivery Time: ${orderData.time}
 • Number of Meals: ${orderData.mealQuantity}
-• Special Instructions: ${orderData.specialInstructions || 'None'}
+• Special Instructions: ${orderData.specialInstructions || "None"}
 • Order Time: ${new Date(orderData.createdAt).toLocaleString()}
 
 💰 Next Steps:
@@ -58,10 +59,10 @@ Customer Contact: ${orderData.phone}
   try {
     // 1. Send Email Notification
     try {
-      const emailResponse = await fetch('/api/send-email', {
-        method: 'POST',
+      const emailResponse = await fetch("/api/send-email", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           to: VENDOR_CONFIG.email,
@@ -81,17 +82,17 @@ Customer Contact: ${orderData.phone}
                   <table style="width: 100%; border-collapse: collapse;">
                     <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Customer:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${orderData.name}</td></tr>
                     <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Phone:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${orderData.phone}</td></tr>
-                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Email:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${orderData.email || 'Not provided'}</td></tr>
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Email:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${orderData.email || "Not provided"}</td></tr>
                     <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Delivery Address:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${orderData.deliveryAddress}</td></tr>
-                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Delivery Date:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${new Date(orderData.date).toLocaleDateString('en-US', { 
-                      weekday: 'long', 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    })}</td></tr>
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Delivery Date:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${new Date(orderData.date).toLocaleDateString("en-US", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}</td></tr>
                     <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Delivery Time:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${orderData.time}</td></tr>
                     <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Number of Meals:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${orderData.mealQuantity}</td></tr>
-                    <tr><td style="padding: 8px 0;"><strong>Special Instructions:</strong></td><td style="padding: 8px 0;">${orderData.specialInstructions || 'None'}</td></tr>
+                    <tr><td style="padding: 8px 0;"><strong>Special Instructions:</strong></td><td style="padding: 8px 0;">${orderData.specialInstructions || "None"}</td></tr>
                   </table>
                   
                   <div style="margin-top: 20px; padding: 15px; background: #f0f8f0; border-radius: 5px;">
@@ -109,69 +110,63 @@ Customer Contact: ${orderData.phone}
                 </div>
               </div>
             </div>
-          `
-        })
+          `,
+        }),
       });
-      
+
       if (emailResponse.ok) {
         notifications.email = true;
       }
     } catch (emailError) {
-      console.error('Email notification failed:', emailError);
+      console.error("Email notification failed:", emailError);
     }
 
     // 2. Send SMS Notification
     try {
-      const smsResponse = await fetch('/api/send-sms', {
-        method: 'POST',
+      const smsResponse = await fetch("/api/send-sms", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           to: VENDOR_CONFIG.phone,
-          message: `🍽️ NEW ORDER ${orderData.id}\n\nCustomer: ${orderData.name}\nPhone: ${orderData.phone}\nDelivery: ${new Date(orderData.date).toLocaleDateString()} at ${orderData.time}\nMeals: ${orderData.mealQuantity}\n\nCall customer to confirm menu and payment.`
-        })
+          message: `🍽️ NEW ORDER ${orderData.id}\n\nCustomer: ${orderData.name}\nPhone: ${orderData.phone}\nDelivery: ${new Date(orderData.date).toLocaleDateString()} at ${orderData.time}\nMeals: ${orderData.mealQuantity}\n\nCall customer to confirm menu and payment.`,
+        }),
       });
-      
+
       if (smsResponse.ok) {
         notifications.sms = true;
       }
     } catch (smsError) {
-      console.error('SMS notification failed:', smsError);
+      console.error("SMS notification failed:", smsError);
     }
 
     // 3. Send WhatsApp Notification
     try {
-      // Method 1: WhatsApp Business API (if you have it set up)
-      const whatsappResponse = await fetch('/api/send-whatsapp', {
-        method: 'POST',
+      const whatsappResponse = await fetch("/api/send-whatsapp", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           to: VENDOR_CONFIG.whatsapp,
-          message: orderDetails
-        })
+          message: orderDetails,
+        }),
       });
-      
+
       if (whatsappResponse.ok) {
         notifications.whatsapp = true;
       }
     } catch (whatsappError) {
-      console.error('WhatsApp API notification failed:', whatsappError);
-      
-      // Method 2: Fallback - Open WhatsApp Web/App with pre-filled message
-      const whatsappMessage = encodeURIComponent(orderDetails);
-      const whatsappUrl = `https://wa.me/${VENDOR_CONFIG.whatsapp.replace('+', '')}?text=${whatsappMessage}`;
-      
-      // In a real app, you might want to open this in a new window
-      // window.open(whatsappUrl, '_blank');
-      console.log('WhatsApp fallback URL:', whatsappUrl);
-      notifications.whatsapp = 'fallback';
-    }
+      console.error("WhatsApp API notification failed:", whatsappError);
 
+      const whatsappMessage = encodeURIComponent(orderDetails);
+      const whatsappUrl = `https://wa.me/${VENDOR_CONFIG.whatsapp.replace("+", "")}?text=${whatsappMessage}`;
+      console.log("WhatsApp fallback URL:", whatsappUrl);
+      notifications.whatsapp = "fallback";
+    }
   } catch (error) {
-    console.error('Vendor notification error:', error);
+    console.error("Vendor notification error:", error);
   }
 
   return notifications;
@@ -198,9 +193,7 @@ const calculateTimeRemaining = (targetDate) => {
 
 // Countdown Timer Component
 const CountdownTimer = ({ targetDate }) => {
-  const [timeRemaining, setTimeRemaining] = useState(
-    calculateTimeRemaining(targetDate)
-  );
+  const [timeRemaining, setTimeRemaining] = useState(calculateTimeRemaining(targetDate));
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -252,21 +245,20 @@ const NotificationStatus = ({ notifications }) => {
       <div className="space-y-1 text-xs">
         <div className="flex justify-between">
           <span>Email:</span>
-          <span className={notifications.email ? 'text-green-600' : 'text-red-600'}>
-            {notifications.email ? '✅ Sent' : '❌ Failed'}
+          <span className={notifications.email ? "text-green-600" : "text-red-600"}>
+            {notifications.email ? "✅ Sent" : "❌ Failed"}
           </span>
         </div>
         <div className="flex justify-between">
           <span>SMS:</span>
-          <span className={notifications.sms ? 'text-green-600' : 'text-red-600'}>
-            {notifications.sms ? '✅ Sent' : '❌ Failed'}
+          <span className={notifications.sms ? "text-green-600" : "text-red-600"}>
+            {notifications.sms ? "✅ Sent" : "❌ Failed"}
           </span>
         </div>
         <div className="flex justify-between">
           <span>WhatsApp:</span>
-          <span className={notifications.whatsapp ? 'text-green-600' : 'text-red-600'}>
-            {notifications.whatsapp === 'fallback' ? '⚠️ Manual' : 
-             notifications.whatsapp ? '✅ Sent' : '❌ Failed'}
+          <span className={notifications.whatsapp ? "text-green-600" : "text-red-600"}>
+            {notifications.whatsapp === "fallback" ? "⚠️ Manual" : notifications.whatsapp ? "✅ Sent" : "❌ Failed"}
           </span>
         </div>
       </div>
@@ -324,7 +316,7 @@ const MealBookingPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     const form = e.target;
 
     try {
@@ -340,9 +332,7 @@ const MealBookingPage = () => {
             : order
         );
         setOrders(updatedOrders);
-        setCurrentOrder(
-          updatedOrders.find((order) => order.id === formFields.id) || null
-        );
+        setCurrentOrder(updatedOrders.find((order) => order.id === formFields.id) || null);
         setView("success");
       } else {
         // New order
@@ -375,8 +365,8 @@ const MealBookingPage = () => {
 
       form.reset();
     } catch (error) {
-      console.error('Order submission error:', error);
-      alert('There was an error processing your order. Please try again.');
+      console.error("Order submission error:", error);
+      alert("There was an error processing your order. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -419,18 +409,14 @@ const MealBookingPage = () => {
   const handleTrackSubmit = (e) => {
     e.preventDefault();
     const form = e.target;
-    const foundOrder = orders.find(
-      (order) => order.id === trackingId.toUpperCase()
-    );
+    const foundOrder = orders.find((order) => order.id === trackingId.toUpperCase());
 
     if (foundOrder) {
       setCurrentOrder(foundOrder);
       setView("success");
       setTrackingError("");
     } else {
-      setTrackingError(
-        "Order ID not found. Please check your ID and try again."
-      );
+      setTrackingError("Order ID not found. Please check your ID and try again.");
     }
 
     form.reset();
@@ -639,14 +625,32 @@ const MealBookingPage = () => {
                   >
                     {isSubmitting ? (
                       <span className="flex items-center justify-center">
-                        <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        <svg
+                          className="animate-spin -ml-1 mr-3 h-4 w-4 text-current"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
                         </svg>
                         Processing...
                       </span>
+                    ) : formFields.id ? (
+                      "Update Order"
                     ) : (
-                      formFields.id ? "Update Order" : "Confirm Booking"
+                      "Confirm Booking"
                     )}
                   </button>
                 </form>
@@ -711,7 +715,6 @@ const MealBookingPage = () => {
 
                 <CountdownTimer targetDate={currentOrder.dateTime} />
 
-                {/* Notification Status */}
                 <NotificationStatus notifications={notifications} />
 
                 <div className="flex gap-2 mt-4 sm:gap-3">

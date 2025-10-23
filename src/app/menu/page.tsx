@@ -1,8 +1,9 @@
 "use client";
 
+import emailjs from '@emailjs/browser';
 import { useState, useEffect } from "react";
 
-// Define the type for a single menu item
+
 type MenuItem = {
   id: number;
   name: string;
@@ -15,7 +16,7 @@ type MenuItem = {
   category?: "main" | "grill" | "small-chops";
 };
 
-// Define the type for a cart item
+
 type CartItem = {
   id: number;
   name: string;
@@ -25,7 +26,7 @@ type CartItem = {
   image: string;
 };
 
-// Define the type for a cart option
+
 interface CartOption {
   group: string;
   option: string;
@@ -42,7 +43,7 @@ type OrderInfo = {
   orderNumber: string;
 };
 
-// Background images
+
 const backgroundImages = [
   "/images/bg1.png",
   "/images/bg2.png",
@@ -50,15 +51,15 @@ const backgroundImages = [
   "/images/bg4.png",
 ];
 
-// Function to generate order number
+
 const generateOrderNumber = () => {
   const random = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
   return `AZ-${random}`;
 };
 
-// Define menu items with images and structured options
+
 const menu: MenuItem[] = [
-  // Main Menu Items
+
   {
     id: 1,
     name: "Stir Fry Spaghetti",
@@ -253,7 +254,7 @@ const menu: MenuItem[] = [
       },
     ],
   },
-  // Grill Menu Items
+  
   {
     id: 10,
     name: "Barbeque Chicken",
@@ -328,7 +329,7 @@ const menu: MenuItem[] = [
       },
     ],
   },
-  // Small Chops and Events Items
+ 
   {
     id: 14,
     name: "Puff Puff",
@@ -895,47 +896,60 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         orderNumber: orderNumber,
       };
 
-      const emailRecipient = "adejaretalabi@gmail.com";
-      const phoneRecipient = "08132791933";
-
+      // Format order message for email
       const orderMessage =
-        "New Order Details:\n" +
-        `Order Number: ${orderDetails.orderNumber}\n` +
+        `🍽️ NEW ORDER RECEIVED!\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `📋 Order Number: ${orderDetails.orderNumber}\n` +
+        `🕐 Order Time: ${new Date().toLocaleString()}\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+        `👤 CUSTOMER DETAILS:\n` +
         `Name: ${orderDetails.customerName}\n` +
         `Phone: ${orderDetails.customerPhone}\n` +
-        `Address: ${orderDetails.customerAddress}\n` +
-        `Time: ${new Date().toLocaleString()}\n` +
-        "---\n" +
-        "Order Summary:\n" +
-        orderDetails.orderItems
-          .map(
-            (item) =>
-              `- ${item.name} x${item.quantity} (₦${item.price * item.quantity})`
-          )
-          .join("\n") +
-        "\n" +
-        "---\n" +
-        `Total: ₦${orderDetails.totalPrice}`;
+        `Address: ${orderDetails.customerAddress}\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `🛒 ORDER SUMMARY:\n\n` +
+        `${orderDetails.orderItems
+          .map((item) => {
+            let itemText = `• ${item.name} x${item.quantity} - ₦${item.price * item.quantity}`;
+            if (item.option && item.option.trim() !== "") {
+              itemText += `\n  └─ ${item.option}`;
+            }
+            return itemText;
+          })
+          .join('\n\n')}\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `💰 TOTAL AMOUNT: ₦${orderDetails.totalPrice}\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+        `💵 Payment Method: Cash on Delivery\n` +
+        `📦 Delivery Location: Lagos\n\n` +
+        `Please contact the customer to confirm the order.`;
 
-      console.log("Preparing to send order details...");
-      console.log("Email recipient:", emailRecipient);
-      console.log("Phone recipient:", phoneRecipient);
+      console.log("Preparing to send order via EmailJS...");
       console.log("Order message:", orderMessage);
 
-      // Simulate async processing
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          console.log("Simulated order processing completed");
-          resolve("Order processed successfully");
-        }, 2000);
-      });
+      // Create template parameters for EmailJS
+      const templateParams = {
+        from_name: orderDetails.customerName,
+        reply_to: orderDetails.customerPhone,
+        message: orderMessage
+      };
 
+      
+      await emailjs.send(
+        'service_3jb0m5n',      
+        'template_44eijdh',    
+        templateParams,
+        'XJ4j-BxpbF5DXeASx'     
+      );
+
+      console.log("✅ Email sent successfully via EmailJS");
       console.log("Calling onConfirmOrder with orderDetails:", orderDetails);
       onConfirmOrder(orderDetails);
       console.log("onConfirmOrder called successfully");
     } catch (err) {
-      console.error("Error in order processing:", err);
-      setError("Failed to place order. Please try again.");
+      console.error("❌ Error in order processing:", err);
+      setError("Failed to send order. Please check your internet connection and try again.");
     } finally {
       setLoading(false);
       console.log("Loading state reset to false");
@@ -1020,7 +1034,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                 className="btn-gold font-lora text-xs sm:text-sm"
                 disabled={loading}
               >
-                {loading ? "Processing..." : "Place Order"}
+                {loading ? "Sending Order..." : "Place Order"}
               </button>
             </div>
           </form>
