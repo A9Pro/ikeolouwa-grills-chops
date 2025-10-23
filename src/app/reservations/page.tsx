@@ -131,7 +131,7 @@ const sendVendorNotifications = async (orderData: any) => {
 };
 
 // Function to calculate time remaining
-const calculateTimeRemaining = (targetDate) => {
+const calculateTimeRemaining = (targetDate: string | Date) => {
   const now = new Date().getTime();
   const target = new Date(targetDate).getTime();
   const difference = target - now;
