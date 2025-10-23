@@ -21,7 +21,7 @@ const generateOrderId = () => {
 };
 
 // Function to send vendor notifications
-const sendVendorNotifications = async (orderData) => {
+const sendVendorNotifications = async (orderData: any) => {
   const notifications = {
     email: false,
     sms: "removed",
