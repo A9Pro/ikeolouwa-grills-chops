@@ -1,5 +1,6 @@
 "use client";
 
+import emailjs from "@emailjs/browser";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 
@@ -23,11 +24,11 @@ const generateOrderId = () => {
 const sendVendorNotifications = async (orderData) => {
   const notifications = {
     email: false,
-    sms: false,
-    whatsapp: false,
+    sms: "removed",
+    whatsapp: "removed",
   };
 
-  // Format order details for notification
+  // Format order details
   const orderDetails = `
 🍽️ NEW MEAL BOOKING - ${VENDOR_CONFIG.businessName}
 
@@ -47,126 +48,83 @@ const sendVendorNotifications = async (orderData) => {
 • Number of Meals: ${orderData.mealQuantity}
 • Special Instructions: ${orderData.specialInstructions || "None"}
 • Order Time: ${new Date(orderData.createdAt).toLocaleString()}
-
-💰 Next Steps:
-1. Call customer to confirm menu selection
-2. Confirm payment method (Cash on delivery/Bank transfer)
-3. Prepare order for scheduled delivery
-
-Customer Contact: ${orderData.phone}
   `.trim();
 
   try {
-    // 1. Send Email Notification
-    try {
-      const emailResponse = await fetch("/api/send-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: VENDOR_CONFIG.email,
-          subject: `🍽️ New Order ${orderData.id} - ${orderData.name}`,
-          text: orderDetails,
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <div style="background: #D4A017; color: white; padding: 20px; text-align: center;">
-                <h1>🍽️ New Meal Booking</h1>
-                <h2>${VENDOR_CONFIG.businessName}</h2>
+    // ✅ Send Email Notification via EmailJS
+    const templateParams = {
+      to_name: VENDOR_CONFIG.businessName,
+      to_email: VENDOR_CONFIG.email,
+      order_id: orderData.id,
+      customer_name: orderData.name,
+      customer_phone: orderData.phone,
+      customer_email: orderData.email || "Not provided",
+      delivery_address: orderData.deliveryAddress,
+      delivery_date: new Date(orderData.date).toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+      delivery_time: orderData.time,
+      meal_quantity: orderData.mealQuantity,
+      special_instructions: orderData.specialInstructions || "None",
+      order_details: orderDetails,
+      html_content: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: #D4A017; color: white; padding: 20px; text-align: center;">
+            <h1>🍽️ New Meal Booking</h1>
+            <h2>${VENDOR_CONFIG.businessName}</h2>
+          </div>
+          
+          <div style="background: #f8f9fa; padding: 20px;">
+            <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+              <h3 style="color: #D4A017; margin-top: 0;">Order #${orderData.id}</h3>
+              
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Customer:</strong></td><td>${orderData.name}</td></tr>
+                <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Phone:</strong></td><td>${orderData.phone}</td></tr>
+                <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Email:</strong></td><td>${orderData.email || "Not provided"}</td></tr>
+                <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Delivery Address:</strong></td><td>${orderData.deliveryAddress}</td></tr>
+                <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Delivery Date:</strong></td><td>${new Date(orderData.date).toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })}</td></tr>
+                <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Delivery Time:</strong></td><td>${orderData.time}</td></tr>
+                <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Number of Meals:</strong></td><td>${orderData.mealQuantity}</td></tr>
+                <tr><td style="padding: 8px 0;"><strong>Special Instructions:</strong></td><td>${orderData.specialInstructions || "None"}</td></tr>
+              </table>
+              
+              <div style="margin-top: 20px; padding: 15px; background: #f0f8f0; border-radius: 5px;">
+                <h4 style="color: #2d5a2d; margin: 0 0 10px 0;">💰 Next Steps:</h4>
+                <ol style="margin: 0; padding-left: 20px;">
+                  <li>Call customer to confirm menu selection</li>
+                  <li>Confirm payment method (Cash on delivery/Bank transfer)</li>
+                  <li>Prepare order for scheduled delivery</li>
+                </ol>
               </div>
               
-              <div style="background: #f8f9fa; padding: 20px;">
-                <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                  <h3 style="color: #D4A017; margin-top: 0;">Order #${orderData.id}</h3>
-                  
-                  <table style="width: 100%; border-collapse: collapse;">
-                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Customer:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${orderData.name}</td></tr>
-                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Phone:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${orderData.phone}</td></tr>
-                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Email:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${orderData.email || "Not provided"}</td></tr>
-                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Delivery Address:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${orderData.deliveryAddress}</td></tr>
-                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Delivery Date:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${new Date(orderData.date).toLocaleDateString("en-US", {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}</td></tr>
-                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Delivery Time:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${orderData.time}</td></tr>
-                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Number of Meals:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #eee;">${orderData.mealQuantity}</td></tr>
-                    <tr><td style="padding: 8px 0;"><strong>Special Instructions:</strong></td><td style="padding: 8px 0;">${orderData.specialInstructions || "None"}</td></tr>
-                  </table>
-                  
-                  <div style="margin-top: 20px; padding: 15px; background: #f0f8f0; border-radius: 5px;">
-                    <h4 style="color: #2d5a2d; margin: 0 0 10px 0;">💰 Next Steps:</h4>
-                    <ol style="margin: 0; padding-left: 20px;">
-                      <li>Call customer to confirm menu selection</li>
-                      <li>Confirm payment method (Cash on delivery/Bank transfer)</li>
-                      <li>Prepare order for scheduled delivery</li>
-                    </ol>
-                  </div>
-                  
-                  <div style="text-align: center; margin-top: 20px;">
-                    <a href="tel:${orderData.phone}" style="background: #D4A017; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">📞 Call Customer</a>
-                  </div>
-                </div>
+              <div style="text-align: center; margin-top: 20px;">
+                <a href="tel:${orderData.phone}" style="background: #D4A017; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">📞 Call Customer</a>
               </div>
             </div>
-          `,
-        }),
-      });
+          </div>
+        </div>
+      `,
+    };
 
-      if (emailResponse.ok) {
-        notifications.email = true;
-      }
-    } catch (emailError) {
-      console.error("Email notification failed:", emailError);
-    }
+    await emailjs.send(
+      "service_3jb0m5n", 
+      "template_t8r3icp", 
+      templateParams,
+      "XJ4j-BxpbF5DXeASx" 
+    );
 
-    // 2. Send SMS Notification
-    try {
-      const smsResponse = await fetch("/api/send-sms", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: VENDOR_CONFIG.phone,
-          message: `🍽️ NEW ORDER ${orderData.id}\n\nCustomer: ${orderData.name}\nPhone: ${orderData.phone}\nDelivery: ${new Date(orderData.date).toLocaleDateString()} at ${orderData.time}\nMeals: ${orderData.mealQuantity}\n\nCall customer to confirm menu and payment.`,
-        }),
-      });
-
-      if (smsResponse.ok) {
-        notifications.sms = true;
-      }
-    } catch (smsError) {
-      console.error("SMS notification failed:", smsError);
-    }
-
-    // 3. Send WhatsApp Notification
-    try {
-      const whatsappResponse = await fetch("/api/send-whatsapp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: VENDOR_CONFIG.whatsapp,
-          message: orderDetails,
-        }),
-      });
-
-      if (whatsappResponse.ok) {
-        notifications.whatsapp = true;
-      }
-    } catch (whatsappError) {
-      console.error("WhatsApp API notification failed:", whatsappError);
-
-      const whatsappMessage = encodeURIComponent(orderDetails);
-      const whatsappUrl = `https://wa.me/${VENDOR_CONFIG.whatsapp.replace("+", "")}?text=${whatsappMessage}`;
-      console.log("WhatsApp fallback URL:", whatsappUrl);
-      notifications.whatsapp = "fallback";
-    }
-  } catch (error) {
-    console.error("Vendor notification error:", error);
+    notifications.email = true;
+  } catch (emailError) {
+    console.error("EmailJS notification failed:", emailError);
   }
 
   return notifications;
@@ -724,7 +682,7 @@ const MealBookingPage = () => {
                   >
                     Edit Order
                   </button>
-                  <button
+                  <button 
                     onClick={handleMakeAnother}
                     className="flex-1 btn-gold font-lora text-xs sm:text-sm"
                   >

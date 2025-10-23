@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
-// Create a transporter using Gmail
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -10,16 +9,20 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export async function POST(request: Request) {
+export async function POST(request: Request): Promise<Response> {
   try {
     const order = await request.json();
     console.log("Received order data:", JSON.stringify(order, null, 2));
 
-    // Verify environment variables
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS || !process.env.ADMIN_EMAIL) {
+    // Check environment variables
+    if (
+      !process.env.EMAIL_USER ||
+      !process.env.EMAIL_PASS ||
+      !process.env.ADMIN_EMAIL
+    ) {
       console.error("Missing environment variables:", {
         EMAIL_USER: process.env.EMAIL_USER,
-        EMAIL_PASS: process.env.EMAIL_PASS,
+        EMAIL_PASS: process.env.EMAIL_PASS ? "****" : undefined,
         ADMIN_EMAIL: process.env.ADMIN_EMAIL,
       });
       return NextResponse.json(
@@ -28,11 +31,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verify transporter connection
-    await transporter.verify();
-    console.log("Transporter is ready");
 
-    // Format the email message
+  
     const message = `
       New Order: ${order.id}
       Name: ${order.name}
@@ -45,28 +45,30 @@ export async function POST(request: Request) {
       Instructions: ${order.specialInstructions || "None"}
     `;
 
-    console.log("Attempting to send email to:", process.env.ADMIN_EMAIL);
-    console.log("Message:", message);
+    console.log("Sending email to:", process.env.ADMIN_EMAIL);
 
-    // Send email to admin
     await transporter.sendMail({
       from: `"Meal Booking" <${process.env.EMAIL_USER}>`,
       to: process.env.ADMIN_EMAIL,
       subject: `New Meal Order: ${order.id}`,
       text: message,
-      html: `<p>${message.replace(/\n/g, "<br>")}</p>`,
+      html: `<pre>${message}</pre>`,
     });
 
-    console.log("Email sent successfully");
+    console.log("✅ Email sent successfully");
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
-    console.error("Error sending email:", {
-      message: error.message,
-      code: (error as any).code,
-      response: (error as any).response,
-    });
+    if (error instanceof Error) {
+      console.error("Error sending email:", {
+        message: error.message,
+        stack: error.stack,
+      });
+    } else {
+      console.error("Unknown error sending email:", error);
+    }
+
     return NextResponse.json(
-      { error: "Failed to send email notification", details: error.message },
+      { error: "Failed to send vendor notification." },
       { status: 500 }
     );
   }
