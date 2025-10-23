@@ -1,5 +1,6 @@
 "use client";
 
+import emailjs from "@emailjs/browser";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 
@@ -34,44 +35,25 @@ export default function AboutContactPage() {
   };
 
   // ✅ Fixed handler
-  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const form = e.target as HTMLFormElement;
-    const formData = new FormData(form);
-    const contactData = Object.fromEntries(formData.entries());
+const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  const form = e.target as HTMLFormElement;
 
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(contactData),
-      });
+  try {
+    await emailjs.sendForm(
+      "service_3jb0m5n",     
+      "template_44eijdh",   
+      form,
+      "XJ4j-BxpbF5DXeASx"      
+    );
 
-      let data: any = {};
-      try {
-        data = await response.json();
-      } catch {
-        // fallback if server sends HTML error
-        data = {};
-      }
-
-      if (response.ok) {
-        showMessage(
-          data.message ||
-            "✅ Thank you for your message! We'll get back to you shortly."
-        );
-        form.reset();
-      } else {
-        showMessage(
-          data.error ||
-            `❌ Something went wrong (status ${response.status}). Please try again.`
-        );
-      }
-    } catch (error) {
-      console.error("❌ Submission error:", error);
-      showMessage("⚠️ Error sending your message. Please try again later.");
-    }
-  };
+    showMessage("✅ Thank you! Your message has been sent successfully.");
+    form.reset();
+  } catch (error) {
+    console.error("EmailJS Error:", error);
+    showMessage("❌ Failed to send your message. Please try again later.");
+  }
+};
 
   // Custom styles
   const customStyles = `
