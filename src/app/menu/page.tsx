@@ -907,7 +907,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         })
         .join('\n\n');
 
-
+      // Get current date and time
       const orderTime = new Date().toLocaleString('en-NG', {
         dateStyle: 'medium',
         timeStyle: 'short'
@@ -915,7 +915,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
       console.log("Preparing to send order via EmailJS...");
 
-      
+      // Create template parameters matching your EmailJS template variables
       const templateParams = {
         order_number: orderDetails.orderNumber,
         order_time: orderTime,
@@ -928,9 +928,11 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
       console.log("Template params:", templateParams);
       
+      // Show success immediately for better UX
       console.log("Showing success modal immediately");
       onConfirmOrder(orderDetails);
       
+      // Send email in background (don't await)
       emailjs.send(
         'service_3jb0m5n',      
         'template_44eijdh',    
@@ -941,6 +943,15 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
       }).catch((emailError) => {
         console.error("❌ Email send failed (but order was recorded):", emailError);
       });
+
+    } catch (err) {
+      console.error("❌ Error in order processing:", err);
+      setError("Failed to send order. Please check your internet connection and try again.");
+    } finally {
+      setLoading(false);
+      console.log("Loading state reset to false");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
