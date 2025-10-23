@@ -54,7 +54,7 @@ const sendVendorNotifications = async (orderData: any) => {
     // ✅ Send Email Notification via EmailJS
     const templateParams = {
       to_name: VENDOR_CONFIG.businessName,
-      to_email: VENDOR_CONFIG.email,
+      to_email: "herpick3@gmail.com",
       order_id: orderData.id,
       customer_name: orderData.name,
       customer_phone: orderData.phone,
