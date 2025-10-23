@@ -896,45 +896,37 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         orderNumber: orderNumber,
       };
 
-      // Format order message for email
-      const orderMessage =
-        `🍽️ NEW ORDER RECEIVED!\n\n` +
-        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-        `📋 Order Number: ${orderDetails.orderNumber}\n` +
-        `🕐 Order Time: ${new Date().toLocaleString()}\n` +
-        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
-        `👤 CUSTOMER DETAILS:\n` +
-        `Name: ${orderDetails.customerName}\n` +
-        `Phone: ${orderDetails.customerPhone}\n` +
-        `Address: ${orderDetails.customerAddress}\n\n` +
-        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-        `🛒 ORDER SUMMARY:\n\n` +
-        `${orderDetails.orderItems
-          .map((item) => {
-            let itemText = `• ${item.name} x${item.quantity} - ₦${item.price * item.quantity}`;
-            if (item.option && item.option.trim() !== "") {
-              itemText += `\n  └─ ${item.option}`;
-            }
-            return itemText;
-          })
-          .join('\n\n')}\n\n` +
-        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-        `💰 TOTAL AMOUNT: ₦${orderDetails.totalPrice}\n` +
-        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
-        `💵 Payment Method: Cash on Delivery\n` +
-        `📦 Delivery Location: Lagos\n\n` +
-        `Please contact the customer to confirm the order.`;
+      // Format order items for email
+      const formattedOrderItems = orderDetails.orderItems
+        .map((item) => {
+          let itemText = `• ${item.name} x${item.quantity} - ₦${(item.price * item.quantity).toLocaleString()}`;
+          if (item.option && item.option.trim() !== "") {
+            itemText += `\n  └─ ${item.option}`;
+          }
+          return itemText;
+        })
+        .join('\n\n');
+
+      // Get current date and time
+      const orderTime = new Date().toLocaleString('en-NG', {
+        dateStyle: 'medium',
+        timeStyle: 'short'
+      });
 
       console.log("Preparing to send order via EmailJS...");
-      console.log("Order message:", orderMessage);
 
-      // Create template parameters for EmailJS
+      // Create template parameters matching your EmailJS template variables
       const templateParams = {
-        from_name: orderDetails.customerName,
-        reply_to: orderDetails.customerPhone,
-        message: orderMessage
+        order_number: orderDetails.orderNumber,
+        order_time: orderTime,
+        customer_name: orderDetails.customerName,
+        customer_phone: orderDetails.customerPhone,
+        customer_address: orderDetails.customerAddress,
+        order_items: formattedOrderItems,
+        total_price: `₦${orderDetails.totalPrice.toLocaleString()}`
       };
 
+      console.log("Template params:", templateParams);
       
       await emailjs.send(
         'service_3jb0m5n',      
