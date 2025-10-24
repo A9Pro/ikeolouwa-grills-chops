@@ -28,33 +28,9 @@ const sendVendorNotifications = async (orderData: any) => {
     whatsapp: "removed",
   };
 
-  // Format order details
-  const orderDetails = `
-🍽️ NEW MEAL BOOKING - ${VENDOR_CONFIG.businessName}
-
-📋 Order Details:
-- Order ID: ${orderData.id}
-- Customer: ${orderData.name}
-- Phone: ${orderData.phone}
-- Email: ${orderData.email || "Not provided"}
-- Delivery Address: ${orderData.deliveryAddress}
-- Delivery Date: ${new Date(orderData.date).toLocaleDateString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  })}
-- Delivery Time: ${orderData.time}
-- Number of Meals: ${orderData.mealQuantity}
-- Special Instructions: ${orderData.specialInstructions || "None"}
-- Order Time: ${new Date(orderData.createdAt).toLocaleString()}
-  `.trim();
-
   try {
     // ✅ Send Email Notification via EmailJS
     const templateParams = {
-      to_name: VENDOR_CONFIG.businessName,
-      to_email: "herpick3@gmail.com",
       order_id: orderData.id,
       customer_name: orderData.name,
       customer_phone: orderData.phone,
@@ -69,58 +45,20 @@ const sendVendorNotifications = async (orderData: any) => {
       delivery_time: orderData.time,
       meal_quantity: orderData.mealQuantity,
       special_instructions: orderData.specialInstructions || "None",
-      order_details: orderDetails,
-      html_content: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background: #D4A017; color: white; padding: 20px; text-align: center;">
-            <h1>🍽️ New Meal Booking</h1>
-            <h2>${VENDOR_CONFIG.businessName}</h2>
-          </div>
-          
-          <div style="background: #f8f9fa; padding: 20px;">
-            <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-              <h3 style="color: #D4A017; margin-top: 0;">Order #${orderData.id}</h3>
-              
-              <table style="width: 100%; border-collapse: collapse;">
-                <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Customer:</strong></td><td>${orderData.name}</td></tr>
-                <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Phone:</strong></td><td>${orderData.phone}</td></tr>
-                <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Email:</strong></td><td>${orderData.email || "Not provided"}</td></tr>
-                <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Delivery Address:</strong></td><td>${orderData.deliveryAddress}</td></tr>
-                <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Delivery Date:</strong></td><td>${new Date(orderData.date).toLocaleDateString("en-US", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })}</td></tr>
-                <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Delivery Time:</strong></td><td>${orderData.time}</td></tr>
-                <tr><td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Number of Meals:</strong></td><td>${orderData.mealQuantity}</td></tr>
-                <tr><td style="padding: 8px 0;"><strong>Special Instructions:</strong></td><td>${orderData.specialInstructions || "None"}</td></tr>
-              </table>
-              
-              <div style="margin-top: 20px; padding: 15px; background: #f0f8f0; border-radius: 5px;">
-                <h4 style="color: #2d5a2d; margin: 0 0 10px 0;">💰 Next Steps:</h4>
-                <ol style="margin: 0; padding-left: 20px;">
-                  <li>Call customer to confirm menu selection</li>
-                  <li>Confirm payment method (Cash on delivery/Bank transfer)</li>
-                  <li>Prepare order for scheduled delivery</li>
-                </ol>
-              </div>
-              
-              <div style="text-align: center; margin-top: 20px;">
-                <a href="tel:${orderData.phone}" style="background: #D4A017; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">📞 Call Customer</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      `,
+      order_time: new Date(orderData.createdAt).toLocaleString()
     };
 
-    await emailjs.send(
-      "service_3jb0m5n", 
-      "template_t8r3icp", 
+    // Send email in background for better UX
+    emailjs.send(
+      "service_3jb0m5n",
+      "template_t8r3icp",
       templateParams,
-      "XJ4j-BxpbF5DXeASx" 
-    );
+      "XJ4j-BxpbF5DXeASx"
+    ).then(() => {
+      console.log("✅ Reservation email sent successfully");
+    }).catch((error) => {
+      console.error("❌ Reservation email failed:", error);
+    });
 
     notifications.email = true;
   } catch (emailError) {
