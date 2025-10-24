@@ -7,7 +7,7 @@ import Image from "next/image";
 // Vendor contact information
 const VENDOR_CONFIG = {
   phone: "+2348132791933", // Vendor's phone number
-  email: "herpick3@gmail.com", // Vendor's email
+  email: "bamideleboy3@gmail.com", // Vendor's email
   whatsapp: "+2348132791933", // Vendor's WhatsApp number
   businessName: "IkeOluwa Grills & Chops",
 };

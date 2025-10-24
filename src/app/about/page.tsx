@@ -154,8 +154,8 @@ export default function AboutContactPage() {
                 </div>
                 <div className="flex items-center justify-center space-x-2 text-[#666]">
                   <span>✉️</span>
-                  <a href="mailto:herpick3@gmail.com" className="text-[#D4A017] hover:underline">
-                    herpick3@gmail.com
+                  <a href="mailto:bamideleboy3@gmail.com" className="text-[#D4A017] hover:underline">
+                    bamideleboy3@gmail.com
                   </a>
                 </div>
                 <div className="flex items-center justify-center space-x-2 text-[#666]">
