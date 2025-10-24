@@ -49,15 +49,18 @@ const sendVendorNotifications = async (orderData: any) => {
     };
 
     // Send email in background for better UX
-    emailjs.send(
+    await emailjs.send(
       "service_3jb0m5n",
       "template_t8r3icp",
       templateParams,
       "XJ4j-BxpbF5DXeASx"
     ).then(() => {
       console.log("✅ Reservation email sent successfully");
+      notifications.email = true;
     }).catch((error) => {
       console.error("❌ Reservation email failed:", error);
+      console.error("Error details:", error.text || error.message);
+      notifications.email = false;
     });
 
     notifications.email = true;
